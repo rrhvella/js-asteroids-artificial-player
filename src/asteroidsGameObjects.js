@@ -91,8 +91,8 @@
 
         self.rotation = self.rotation % twoPI;
 
-        if(self.rotation < 0) {
-             self.rotation += twoPI;
+        if (self.rotation < 0) {
+            self.rotation += twoPI;
         }
     };
 
