@@ -125,7 +125,10 @@
         var self = this;
 
         var accelerationMagnitude = 5;
+        var maximumVelocity = 40;
+
         self.velocity.add(self.getHeading().scale(accelerationMagnitude));
+        self.velocity.clamp(maximumVelocity);
     };
 
     asteroids.AIControlledShip.prototype.turn = function (direction) {
