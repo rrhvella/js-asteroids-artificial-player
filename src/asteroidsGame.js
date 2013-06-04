@@ -128,7 +128,7 @@
         var self = this;
 
         var framesPerSecond = 30;
-        var updatesPerSecond = 10;
+        var updatesPerSecond = 20;
 
         setInterval(_.bind(self.draw, self), 1000.0 / framesPerSecond);
         setInterval(_.bind(self.update, self), 1000.0 / updatesPerSecond);

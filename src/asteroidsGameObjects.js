@@ -110,14 +110,14 @@
     asteroids.AIControlledShip.prototype.accelerate = function () {
         var self = this;
 
-        var accelerationMagnitude = 10;
+        var accelerationMagnitude = 5;
         self.velocity.add(self.getHeading().scale(accelerationMagnitude));
     };
 
     asteroids.AIControlledShip.prototype.turn = function (direction) {
         var self = this;
 
-        var rotationAmount = Math.PI * 0.05;
+        var rotationAmount = Math.PI * 0.07;
         self.rotation += rotationAmount * direction;
 
         self.normalizeAngle();
@@ -126,7 +126,7 @@
     asteroids.AIControlledShip.prototype.update = function () {
         var self = this;
 
-        var dampeningFactor = 0.5;
+        var dampeningFactor = 0.95;
         self.velocity.scale(dampeningFactor);
 
         if (self.game.isKeyDown(asteroids.KeyCodes.UP)) {
