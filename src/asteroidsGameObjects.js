@@ -62,7 +62,21 @@
     };
 
     asteroids.AsteroidsGameObject.prototype.update = function () {
-        //pass
+        var self = this;
+
+        var x = self.position.x;
+        var y = self.position.y;
+
+        var canvasWidth = self.game.canvas.width;
+        var canvasHeight = self.game.canvas.height;
+
+        if (x - self.scale > canvasWidth || x + self.scale <= 0) {
+            self.position.x = canvasWidth - x;
+        }
+
+        if (y - self.scale > canvasHeight || y + self.scale <= 0) {
+            self.position.y = canvasHeight - y;
+        }
     };
 
     asteroids.AIControlledShip = function (args) {
