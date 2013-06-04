@@ -37,7 +37,7 @@
         self.game = args.game;
 
         self.position = args.position;
-        self.rotation = args.rotation;
+        self.rotation = 0;
 
         self.scale = args.scale;
 
@@ -45,20 +45,20 @@
         self.image.src = args.imageSrc;
 
         self.velocity = new SAT.Vector(0, 0);
-        self.rotation = 0;
     };
 
     asteroids.AsteroidsGameObject.prototype.draw = function () {
         var self = this;
 
+        self.game.drawingContext.translate(self.position.x, self.position.y);
+        self.game.drawingContext.rotate(self.rotation);
+        self.game.drawingContext.scale(self.scale, self.scale);
 
-        self.game.drawingContext.drawImage(
-            self.image,
-            self.position.x - self.scale / 2,
-            self.position.y - self.scale / 2,
-            self.scale,
-            self.scale
-        );
+        self.game.drawingContext.translate(-0.5, -0.5);
+
+        self.game.drawingContext.drawImage(self.image, 0, 0, 1, 1);
+
+        twoDContextHelpers.resetTransform(self.game.drawingContext);
     };
 
     asteroids.AsteroidsGameObject.prototype.update = function () {
