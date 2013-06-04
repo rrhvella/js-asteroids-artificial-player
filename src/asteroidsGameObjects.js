@@ -39,7 +39,7 @@
         self.position = args.position;
         self.rotation = args.rotation;
 
-        self.size = args.size;
+        self.scale = args.scale;
 
         self.image = new Image();
         self.image.src = args.imageSrc;
@@ -54,10 +54,10 @@
 
         self.game.drawingContext.drawImage(
             self.image,
-            self.position.x - self.size / 2,
-            self.position.y - self.size / 2,
-            self.size,
-            self.size
+            self.position.x - self.scale / 2,
+            self.position.y - self.scale / 2,
+            self.scale,
+            self.scale
         );
     };
 
@@ -74,7 +74,7 @@
                 game: args.game,
 
                 position: args.position,
-                size: 32,
+                scale: 32,
 
                 imageSrc: "media/ship.png"
 
@@ -153,7 +153,7 @@
                 game: args.game,
 
                 position: args.position,
-                size: 128,
+                scale: 128,
 
                 imageSrc: "media/asteroid.png"
 
