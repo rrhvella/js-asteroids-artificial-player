@@ -33,9 +33,15 @@
     asteroids.AsteroidsGame = function (args) {
         var self = this;
 
+        var framesPerSecond = 30;
+        var updatesPerSecond = 20;
+
         self.canvas = args.canvas;
         self.drawingContext = self.canvas.getContext("2d");
         self._keysDownDict = {};
+
+        self.drawingFrameSize = 1000.0 / framesPerSecond;
+        self.updateFrameSize = 1000.0 / updatesPerSecond;
 
         self.gameObjects = [
             new asteroids.AIControlledShip({
@@ -127,10 +133,7 @@
     asteroids.AsteroidsGame.prototype.run = function () {
         var self = this;
 
-        var framesPerSecond = 30;
-        var updatesPerSecond = 20;
-
-        setInterval(_.bind(self.draw, self), 1000.0 / framesPerSecond);
-        setInterval(_.bind(self.update, self), 1000.0 / updatesPerSecond);
+        setInterval(_.bind(self.draw, self), self.drawingFrameSize);
+        setInterval(_.bind(self.update, self), self.updateFrameSize);
     };
 }(window.asteroids = window.asteroids || {}));

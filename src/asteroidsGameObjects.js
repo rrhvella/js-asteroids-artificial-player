@@ -37,14 +37,14 @@
         self.game = args.game;
 
         self.position = args.position;
-        self.rotation = 0;
+        self.rotation = args.rotation || 0;
 
         self.scale = args.scale;
 
         self.image = new Image();
         self.image.src = args.imageSrc;
 
-        self.velocity = new SAT.Vector(0, 0);
+        self.velocity = args.velocity || new SAT.Vector(0, 0);
     };
 
     asteroids.AsteroidsGameObject.prototype.draw = function () {
@@ -77,10 +77,20 @@
         if (y - self.scale > canvasHeight || y + self.scale <= 0) {
             self.position.y = canvasHeight - y;
         }
+
+        self.position.add(self.velocity);
+    };
+
+    asteroids.AsteroidsGameObject.prototype.kill = function () {
+        var self = this;
+
+        self.game.gameObjects = _.without(self.game.gameObjects, self);
     };
 
     asteroids.AIControlledShip = function (args) {
         var self = this;
+
+        self._shootingIntervalPassed = true;
 
         asteroids.AsteroidsGameObject.call(
             self,
@@ -146,6 +156,14 @@
         var dampeningFactor = 0.95;
         self.velocity.scale(dampeningFactor);
 
+        self.interpretKeyPresses();
+
+        asteroids.AsteroidsGameObject.prototype.update.call(self);
+    };
+
+    asteroids.AIControlledShip.prototype.interpretKeyPresses = function () {
+        var self = this;
+
         if (self.game.isKeyDown(asteroids.KeyCodes.UP)) {
             self.accelerate();
         }
@@ -156,10 +174,55 @@
             self.turn(-1);
         }
 
-        self.position.add(self.velocity);
-
-        asteroids.AsteroidsGameObject.prototype.update.call(self);
+        if (self.game.isKeyDown(asteroids.KeyCodes.SPACE)) {
+            self.fire();
+        }
     };
+
+    asteroids.AIControlledShip.prototype.fire = function () {
+        var self = this;
+
+        if (!self._shootingIntervalPassed) {
+            return;
+        }
+
+        self.game.gameObjects.push(
+            new asteroids.Projectile({
+                game: self.game,
+
+                position: (new SAT.Vector()).copy(self.position),
+                direction: self.getHeading()
+            })
+        );
+
+        self._shootingIntervalPassed = false;
+
+        setTimeout(
+            function () { self._shootingIntervalPassed = true; },
+            self.game.updateFrameSize * 5
+        );
+    };
+
+    asteroids.Projectile = function (args) {
+        var self = this;
+
+        var projectileVelocity = 100;
+
+        _.extend(args, {
+            scale: 5,
+            velocity: args.direction.scale(projectileVelocity),
+
+            imageSrc: "media/asteroid.png"
+        });
+
+        asteroids.AsteroidsGameObject.call(self, args);
+
+        var timeToDeath = self.game.updateFrameSize * 5;
+        setTimeout(_.bind(self.kill, self), timeToDeath);
+    };
+
+    _.extend(asteroids.Projectile.prototype, asteroids.AsteroidsGameObject.prototype);
+    asteroids.Projectile.prototype.constructor = asteroids.Projectile;
 
     asteroids.StaticAsteroid = function (args) {
         var self = this;
