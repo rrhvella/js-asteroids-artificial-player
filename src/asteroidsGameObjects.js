@@ -87,6 +87,15 @@
         self.game.gameObjects = _.without(self.game.gameObjects, self);
     };
 
+    asteroids.AsteroidsGameObject.prototype.getCircleCollider = function () {
+        var self = this;
+
+        return new SAT.Circle(self.position, self.scale);
+    };
+
+    asteroids.AsteroidsGameObject.prototype.collidedWith = function (gameObject) {
+    };
+
     asteroids.AIControlledShip = function (args) {
         var self = this;
 
@@ -198,7 +207,9 @@
         self._shootingIntervalPassed = false;
 
         setTimeout(
-            function () { self._shootingIntervalPassed = true; },
+            function () {
+                self._shootingIntervalPassed = true;
+            },
             self.game.updateFrameSize * 5
         );
     };
@@ -243,4 +254,12 @@
 
     _.extend(asteroids.StaticAsteroid.prototype, asteroids.AsteroidsGameObject.prototype);
     asteroids.StaticAsteroid.prototype.constructor = asteroids.StaticAsteroid;
+
+    asteroids.StaticAsteroid.prototype.collidedWith = function (gameObject) {
+        var self = this;
+
+        if (gameObject instanceof asteroids.Projectile) {
+            self.kill();
+        }
+    };
 }(window.asteroids = window.asteroids || {}));

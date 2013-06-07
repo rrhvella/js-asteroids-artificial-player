@@ -125,9 +125,32 @@
     asteroids.AsteroidsGame.prototype.update = function () {
         var self = this;
 
+        self.detectCollisions();
+
         _.each(self.gameObjects, function (gameObject) {
             gameObject.update();
         });
+    };
+
+    asteroids.AsteroidsGame.prototype.detectCollisions = function () {
+        var self = this;
+        var i;
+        var j;
+
+        for (i = 0; i < self.gameObjects.length - 1; i += 1) {
+            for (j = 0; j < self.gameObjects.length; j += 1) {
+                var firstObject = self.gameObjects[i];
+                var secondObject = self.gameObjects[j];
+
+                var firstCollider = firstObject.getCircleCollider();
+                var secondCollider = secondObject.getCircleCollider();
+
+                if (SAT.testCircleCircle(firstCollider, secondCollider)) {
+                    firstObject.collidedWith(secondObject);
+                    secondObject.collidedWith(firstObject);
+                }
+            }
+        }
     };
 
     asteroids.AsteroidsGame.prototype.run = function () {
