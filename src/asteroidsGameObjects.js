@@ -90,7 +90,7 @@
     asteroids.AsteroidsGameObject.prototype.getCircleCollider = function () {
         var self = this;
 
-        return new SAT.Circle(self.position, self.scale);
+        return new SAT.Circle(self.position, self.scale / 2);
     };
 
     asteroids.AsteroidsGameObject.prototype.collidedWith = function (gameObject) {
