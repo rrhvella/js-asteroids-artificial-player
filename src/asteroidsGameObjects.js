@@ -96,10 +96,11 @@
     asteroids.AsteroidsGameObject.prototype.collidedWith = function (gameObject) {
     };
 
-    asteroids.AIControlledShip = function (args) {
+    asteroids.Ship = function (args) {
         var self = this;
 
         self._shootingIntervalPassed = true;
+        self.controlFunction = args.controlFunction;
 
         asteroids.AsteroidsGameObject.call(
             self,
@@ -115,10 +116,10 @@
         );
     };
 
-    _.extend(asteroids.AIControlledShip.prototype, asteroids.AsteroidsGameObject.prototype);
-    asteroids.AIControlledShip.prototype.constructor = asteroids.AIControlledShip;
+    _.extend(asteroids.Ship.prototype, asteroids.AsteroidsGameObject.prototype);
+    asteroids.Ship.prototype.constructor = asteroids.AIControlledShip;
 
-    asteroids.AIControlledShip.prototype.normalizeAngle = function () {
+    asteroids.Ship.prototype.normalizeAngle = function () {
         var self = this;
         var twoPI = Math.PI * 2;
 
@@ -129,7 +130,7 @@
         }
     };
 
-    asteroids.AIControlledShip.prototype.getHeading = function () {
+    asteroids.Ship.prototype.getHeading = function () {
         var self = this;
 
         self.normalizeAngle();
@@ -140,7 +141,7 @@
         return result;
     };
 
-    asteroids.AIControlledShip.prototype.accelerate = function () {
+    asteroids.Ship.prototype.accelerate = function () {
         var self = this;
 
         var accelerationMagnitude = 5;
@@ -150,7 +151,7 @@
         self.velocity.clamp(maximumVelocity);
     };
 
-    asteroids.AIControlledShip.prototype.turn = function (direction) {
+    asteroids.Ship.prototype.turn = function (direction) {
         var self = this;
 
         var rotationAmount = Math.PI * 0.07;
@@ -159,36 +160,18 @@
         self.normalizeAngle();
     };
 
-    asteroids.AIControlledShip.prototype.update = function () {
+    asteroids.Ship.prototype.update = function () {
         var self = this;
 
         var dampeningFactor = 0.95;
         self.velocity.scale(dampeningFactor);
 
-        self.interpretKeyPresses();
+        self.controlFunction(self);
 
         asteroids.AsteroidsGameObject.prototype.update.call(self);
     };
 
-    asteroids.AIControlledShip.prototype.interpretKeyPresses = function () {
-        var self = this;
-
-        if (self.game.isKeyDown(asteroids.KeyCodes.UP)) {
-            self.accelerate();
-        }
-
-        if (self.game.isKeyDown(asteroids.KeyCodes.RIGHT)) {
-            self.turn(1);
-        } else if (self.game.isKeyDown(asteroids.KeyCodes.LEFT)) {
-            self.turn(-1);
-        }
-
-        if (self.game.isKeyDown(asteroids.KeyCodes.SPACE)) {
-            self.fire();
-        }
-    };
-
-    asteroids.AIControlledShip.prototype.fire = function () {
+    asteroids.Ship.prototype.fire = function () {
         var self = this;
 
         if (!self._shootingIntervalPassed) {

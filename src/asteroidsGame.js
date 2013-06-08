@@ -44,12 +44,13 @@
         self.updateFrameSize = 1000.0 / updatesPerSecond;
 
         self.gameObjects = [
-            new asteroids.AIControlledShip({
+            new asteroids.Ship({
                 game: self,
                 position: new SAT.Vector(
                     self.canvas.width * 0.5,
                     self.canvas.height * 0.5
-                )
+                ),
+                controlFunction: asteroids.HumanInputControlFunction
             }),
 
             new asteroids.StaticAsteroid({
