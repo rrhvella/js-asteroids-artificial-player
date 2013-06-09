@@ -58,7 +58,7 @@
 
         self.game.drawingContext.drawImage(self.image, 0, 0, 1, 1);
 
-        twoDContextHelpers.resetTransform(self.game.drawingContext);
+        twoDContextHelperFunctions.resetTransform(self.game.drawingContext);
     };
 
     asteroids.AsteroidsGameObject.prototype.update = function () {
@@ -119,21 +119,10 @@
     _.extend(asteroids.Ship.prototype, asteroids.AsteroidsGameObject.prototype);
     asteroids.Ship.prototype.constructor = asteroids.AIControlledShip;
 
-    asteroids.Ship.prototype.normalizeAngle = function () {
-        var self = this;
-        var twoPI = Math.PI * 2;
-
-        self.rotation = self.rotation % twoPI;
-
-        if (self.rotation < 0) {
-            self.rotation += twoPI;
-        }
-    };
-
     asteroids.Ship.prototype.getHeading = function () {
         var self = this;
 
-        self.normalizeAngle();
+        self.rotation = mathHelperFunctions.normalizeAngle(self.rotation);
 
         var result = new SAT.Vector(-Math.sin(self.rotation), Math.cos(self.rotation));
         result.normalize();
@@ -157,7 +146,7 @@
         var rotationAmount = Math.PI * 0.07;
         self.rotation += rotationAmount * direction;
 
-        self.normalizeAngle();
+        self.rotation = mathHelperFunctions.normalizeAngle(self.rotation);
     };
 
     asteroids.Ship.prototype.update = function () {

@@ -46,4 +46,63 @@
         }
     };
 
+    asteroids.SteeringBehavioursControlFunction = function (ship) {
+        asteroids._ApplyPursuitBehaviour(ship);
+        asteroids._ApplyFireBehaviour(ship);
+    };
+
+    asteroids._ApplyPursuitBehaviour = function (ship) {
+        var asteroidGameObjects = _.filter(ship.game.gameObjects, function (gameObject) {
+            return gameObject instanceof asteroids.StaticAsteroid;
+        });
+
+        var closestAsteroid = _.min(asteroidGameObjects, function (asteroid) {
+            var asteroidAngleInRelationToShip = asteroid.position.angleInRelationTo(ship.position);
+
+            return mathHelperFunctions.minAngularDifference(
+                asteroid.rotation,
+                asteroidAngleInRelationToShip
+            );
+        });
+
+        if (closestAsteroid === Infinity) {
+            return;
+        }
+
+        var normalizedAsteroidRotation = mathHelperFunctions.normalizeAngle(
+            closestAsteroid.position.angleInRelationTo(ship.position)
+        );
+
+        var normalizedShipRotation = mathHelperFunctions.normalizeAngle(ship.rotation);
+
+        if (normalizedAsteroidRotation > normalizedShipRotation) {
+            if (normalizedAsteroidRotation - normalizedShipRotation <= Math.PI) {
+                ship.turn(1);
+            } else {
+                ship.turn(-1);
+            }
+        } else {
+            if (normalizedShipRotation - normalizedAsteroidRotation <= Math.PI) {
+                ship.turn(-1);
+            } else {
+                ship.turn(1);
+            }
+        }
+    };
+
+    asteroids._ApplyFireBehaviour = function (ship) {
+        var lineOfSightRay = new SAT.Ray(ship.position, ship.getHeading());
+
+        var thereIsAnAsteroidWithinTheLineOfSight = _.any(
+            ship.game.gameObjects,
+            function (gameObject) {
+                return gameObject instanceof asteroids.StaticAsteroid &&
+                    SAT.testRayCircle(lineOfSightRay, gameObject.getCircleCollider());
+            }
+        );
+
+        if (thereIsAnAsteroidWithinTheLineOfSight) {
+            ship.fire();
+        }
+    };
 }(window.asteroids = window.asteroids || {}));

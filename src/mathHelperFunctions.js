@@ -27,11 +27,40 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function (twoDContextHelpers) {
+(function (mathHelperFunctions) {
     "use strict";
 
-    twoDContextHelpers.resetTransform = function (context) {
-        context.setTransform(1, 0, 0, 1, 0, 0);
+    mathHelperFunctions.normalizeAngle = function (angle) {
+        var twoPI = Math.PI * 2;
+
+        angle = angle % twoPI;
+
+        if (angle < 0) {
+            angle += twoPI;
+        }
+
+        return angle;
     };
 
-}(window.twoDContextHelpers = window.twoDContextHelpers || {}));
+    mathHelperFunctions.minAngularDifference = function (angle1, angle2) {
+        var angle1Normalized = mathHelperFunctions.normalizeAngle(angle1);
+        var angle2Normalized = mathHelperFunctions.normalizeAngle(angle2);
+
+        var difference = Math.abs(angle1Normalized - angle2Normalized);
+
+        if (difference > Math.PI) {
+            var smallerAngle = angle1Normalized;
+            var largerAngle = angle2Normalized;
+
+            if (angle1Normalized > angle2Normalized) {
+                smallerAngle = angle2Normalized;
+                largerAngle = angle1Normalized;
+            }
+
+            difference = smallerAngle + 2 * Math.PI - largerAngle;
+        }
+
+        return difference;
+    };
+
+}(window.mathHelperFunctions = window.mathHelperFunctions || {}));

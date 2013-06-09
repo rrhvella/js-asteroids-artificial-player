@@ -50,7 +50,7 @@
                     self.canvas.width * 0.5,
                     self.canvas.height * 0.5
                 ),
-                controlFunction: asteroids.HumanInputControlFunction
+                controlFunction: asteroids.SteeringBehavioursControlFunction
             }),
 
             new asteroids.StaticAsteroid({
