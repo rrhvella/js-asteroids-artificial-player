@@ -190,11 +190,12 @@
         var self = this;
 
         var projectileVelocity = 100;
+        var velocity = args.direction.scale(projectileVelocity);
 
         _.extend(args, {
             scale: 5,
-            velocity: args.direction.scale(projectileVelocity),
-
+            velocity: velocity,
+            position: args.position.add(velocity),
             imageSrc: "media/asteroid.png"
         });
 
