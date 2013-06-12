@@ -112,15 +112,24 @@
             asteroids.Projectile.prototype.VELOCITY_MAGNITUDE;
 
         var asteroidRadius = asteroid.getCircleColliderRadius();
-        var distanceToTravel = asteroidOffset.len() - maxProjectileDistance - asteroidRadius;
 
-        if (distanceToTravel <= 0) {
+        var distanceToCurrentOffset = asteroidOffset.len() - maxProjectileDistance - asteroidRadius;
+        var lookAheadTime = distanceToCurrentOffset / (ship.velocity.len() + asteroid.velocity.len());
+
+        var futureAsteroidPosition = _.clone(asteroid.velocity).scale(lookAheadTime)
+                                      .add(asteroid.position);
+
+        var futureAsteroidOffset = _.clone(futureAsteroidPosition).sub(ship.position);
+
+        var distanceToFutureOffset = futureAsteroidOffset.len() - maxProjectileDistance - asteroidRadius;
+
+        if (distanceToFutureOffset <= 0) {
             return;
         }
 
         var breakingDistance = ship.velocity.len2() / (2 * ship.BRAKING_FORCE_MAGNITUDE);
 
-        if (breakingDistance > Math.ceil(distanceToTravel)) {
+        if (breakingDistance > distanceToFutureOffset) {
             return;
         }
 
