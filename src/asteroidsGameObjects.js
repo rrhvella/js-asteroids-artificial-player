@@ -90,7 +90,13 @@
     asteroids.AsteroidsGameObject.prototype.getCircleCollider = function () {
         var self = this;
 
-        return new SAT.Circle(self.position, self.scale / 2);
+        return new SAT.Circle(self.position, self.getCircleColliderRadius());
+    };
+
+    asteroids.AsteroidsGameObject.prototype.getCircleColliderRadius = function () {
+        var self = this;
+
+        return self.scale / 2;
     };
 
     asteroids.AsteroidsGameObject.prototype.collidedWith = function (gameObject) {
@@ -116,8 +122,18 @@
         );
     };
 
+    asteroids.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 40;
+
+    var brakingForceMagnitude = 2;
+    asteroids.Ship.prototype.BRAKING_FORCE_MAGNITUDE = brakingForceMagnitude;
+
+    var accelerationMagnitude = 5;
+    asteroids.Ship.prototype.ACCELERATION_MAGNITUDE = 5;
+
+    asteroids.Ship.prototype.ACTUAL_ACCELERATION_MAGNITUDE = accelerationMagnitude - brakingForceMagnitude;
+
     _.extend(asteroids.Ship.prototype, asteroids.AsteroidsGameObject.prototype);
-    asteroids.Ship.prototype.constructor = asteroids.AIControlledShip;
+    asteroids.Ship.prototype.constructor = asteroids.Ship;
 
     asteroids.Ship.prototype.getHeading = function () {
         var self = this;
@@ -133,11 +149,8 @@
     asteroids.Ship.prototype.accelerate = function () {
         var self = this;
 
-        var accelerationMagnitude = 5;
-        var maximumVelocity = 40;
-
-        self.velocity.add(self.getHeading().scale(accelerationMagnitude));
-        self.velocity.clamp(maximumVelocity);
+        self.velocity.add(self.getHeading().scale(self.ACCELERATION_MAGNITUDE));
+        self.velocity.clamp(self.MAXIMUM_VELOCITY_MAGNITUDE);
     };
 
     asteroids.Ship.prototype.turn = function (direction) {
@@ -152,12 +165,26 @@
     asteroids.Ship.prototype.update = function () {
         var self = this;
 
-        var dampeningFactor = 0.95;
-        self.velocity.scale(dampeningFactor);
-
         self.controlFunction(self);
+        self.brake();
 
         asteroids.AsteroidsGameObject.prototype.update.call(self);
+    };
+
+    asteroids.Ship.prototype.brake = function () {
+        var self = this;
+
+        var velocityMagnitudeSquared = self.velocity.len2();
+        if (velocityMagnitudeSquared > 0) {
+            var velocityMagnitude = Math.sqrt(velocityMagnitudeSquared);
+            var newVelocityMagnitude = velocityMagnitude - self.BRAKING_FORCE_MAGNITUDE;
+
+            if (newVelocityMagnitude < 0) {
+                self.velocity.scale(0);
+            } else {
+                self.velocity.normalize().scale(newVelocityMagnitude);
+            }
+        }
     };
 
     asteroids.Ship.prototype.fire = function () {
@@ -189,8 +216,7 @@
     asteroids.Projectile = function (args) {
         var self = this;
 
-        var projectileVelocity = 100;
-        var velocity = args.direction.scale(projectileVelocity);
+        var velocity = args.direction.scale(self.VELOCITY_MAGNITUDE);
 
         _.extend(args, {
             scale: 5,
@@ -201,12 +227,26 @@
 
         asteroids.AsteroidsGameObject.call(self, args);
 
-        var timeToDeath = self.game.updateFrameSize * 5;
-        setTimeout(_.bind(self.kill, self), timeToDeath);
+        self.timeToDeath = self.NUMBER_OF_FRAMES_TO_DEATH;
     };
+
+    asteroids.Projectile.prototype.VELOCITY_MAGNITUDE = 70;
+    asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 2;
 
     _.extend(asteroids.Projectile.prototype, asteroids.AsteroidsGameObject.prototype);
     asteroids.Projectile.prototype.constructor = asteroids.Projectile;
+
+    asteroids.Projectile.prototype.update = function () {
+        var self = this;
+
+        self.timeToDeath -= 1;
+
+        if (self.timeToDeath === 0) {
+            self.kill();
+        }
+
+        asteroids.AsteroidsGameObject.prototype.update.call(self);
+    };
 
     asteroids.StaticAsteroid = function (args) {
         var self = this;

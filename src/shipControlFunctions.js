@@ -46,12 +46,23 @@
         }
     };
 
-    asteroids.SteeringBehavioursControlFunction = function (ship) {
-        asteroids._ApplyPursuitBehaviour(ship);
-        asteroids._ApplyFireBehaviour(ship);
+    asteroids.AIControlFunction = function (ship) {
+        asteroids._applyPursuitBehaviour(ship);
+        asteroids._applyFireBehaviour(ship);
     };
 
-    asteroids._ApplyPursuitBehaviour = function (ship) {
+    asteroids._applyPursuitBehaviour = function (ship) {
+        var closestAsteroid = asteroids._getClosestAsteroid(ship);
+
+        if (closestAsteroid === null) {
+            return;
+        }
+
+        asteroids._turnShipTowardsAsteroid(ship, closestAsteroid);
+        asteroids._approachAsteroid(ship, closestAsteroid);
+    };
+
+    asteroids._getClosestAsteroid = function (ship) {
         var asteroidGameObjects = _.filter(ship.game.gameObjects, function (gameObject) {
             return gameObject instanceof asteroids.StaticAsteroid;
         });
@@ -66,11 +77,15 @@
         });
 
         if (closestAsteroid === Infinity) {
-            return;
+            return null;
         }
 
+        return closestAsteroid;
+    };
+
+    asteroids._turnShipTowardsAsteroid = function (ship, asteroid) {
         var normalizedAsteroidRotation = mathHelperFunctions.normalizeAngle(
-            closestAsteroid.position.angleInRelationTo(ship.position)
+            asteroid.position.angleInRelationTo(ship.position)
         );
 
         var normalizedShipRotation = mathHelperFunctions.normalizeAngle(ship.rotation);
@@ -90,7 +105,29 @@
         }
     };
 
-    asteroids._ApplyFireBehaviour = function (ship) {
+    asteroids._approachAsteroid = function (ship, asteroid) {
+        var asteroidOffset = _.clone(asteroid.position).sub(ship.position);
+
+        var maxProjectileDistance = asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH *
+            asteroids.Projectile.prototype.VELOCITY_MAGNITUDE;
+
+        var asteroidRadius = asteroid.getCircleColliderRadius();
+        var distanceToTravel = asteroidOffset.len() - maxProjectileDistance - asteroidRadius;
+
+        if (distanceToTravel <= 0) {
+            return;
+        }
+
+        var breakingDistance = ship.velocity.len2() / (2 * ship.BRAKING_FORCE_MAGNITUDE);
+
+        if (breakingDistance > Math.ceil(distanceToTravel)) {
+            return;
+        }
+
+        ship.accelerate();
+    };
+
+    asteroids._applyFireBehaviour = function (ship) {
         var lineOfSightRay = new SAT.Ray(ship.position, ship.getHeading());
 
         var thereIsAnAsteroidWithinTheLineOfSight = _.any(
