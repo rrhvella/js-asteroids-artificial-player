@@ -122,6 +122,7 @@
         );
     };
 
+    asteroids.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.07;
     asteroids.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 40;
 
     var brakingForceMagnitude = 2;
@@ -156,9 +157,7 @@
     asteroids.Ship.prototype.turn = function (direction) {
         var self = this;
 
-        var rotationAmount = Math.PI * 0.07;
-        self.rotation += rotationAmount * direction;
-
+        self.rotation += self.ANGULAR_VELOCITY * direction;
         self.rotation = mathHelperFunctions.normalizeAngle(self.rotation);
     };
 
