@@ -140,7 +140,7 @@
 
         self.rotation = mathHelperFunctions.normalizeAngle(self.rotation);
 
-        var result = new SAT.Vector(-Math.sin(self.rotation), Math.cos(self.rotation));
+        var result = SAT.angleToNormal(self.rotation);
         result.normalize();
 
         return result;
@@ -248,8 +248,9 @@
         asteroids.AsteroidsGameObject.prototype.update.call(self);
     };
 
-    asteroids.StaticAsteroid = function (args) {
+    asteroids.Asteroid = function (args) {
         var self = this;
+        var asteroidVelocityMagnitude = 10;
 
         asteroids.AsteroidsGameObject.call(
             self,
@@ -257,6 +258,7 @@
                 game: args.game,
 
                 position: args.position,
+                velocity: SAT.randomNormal().scale(asteroidVelocityMagnitude),
                 scale: 128,
 
                 imageSrc: "media/asteroid.png"
@@ -265,10 +267,10 @@
         );
     };
 
-    _.extend(asteroids.StaticAsteroid.prototype, asteroids.AsteroidsGameObject.prototype);
-    asteroids.StaticAsteroid.prototype.constructor = asteroids.StaticAsteroid;
+    _.extend(asteroids.Asteroid.prototype, asteroids.AsteroidsGameObject.prototype);
+    asteroids.Asteroid.prototype.constructor = asteroids.Asteroid;
 
-    asteroids.StaticAsteroid.prototype.collidedWith = function (gameObject) {
+    asteroids.Asteroid.prototype.collidedWith = function (gameObject) {
         var self = this;
 
         if (gameObject instanceof asteroids.Projectile) {

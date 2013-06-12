@@ -64,7 +64,7 @@
 
     asteroids._getClosestAsteroid = function (ship) {
         var asteroidGameObjects = _.filter(ship.game.gameObjects, function (gameObject) {
-            return gameObject instanceof asteroids.StaticAsteroid;
+            return gameObject instanceof asteroids.Asteroid;
         });
 
         var closestAsteroid = _.min(asteroidGameObjects, function (asteroid) {
@@ -133,7 +133,7 @@
         var thereIsAnAsteroidWithinTheLineOfSight = _.any(
             ship.game.gameObjects,
             function (gameObject) {
-                return gameObject instanceof asteroids.StaticAsteroid &&
+                return gameObject instanceof asteroids.Asteroid &&
                     SAT.testRayCircle(lineOfSightRay, gameObject.getCircleCollider());
             }
         );

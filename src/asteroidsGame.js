@@ -53,7 +53,7 @@
                 controlFunction: asteroids.AIControlFunction
             }),
 
-            new asteroids.StaticAsteroid({
+            new asteroids.Asteroid({
                 game: self,
                 position: new SAT.Vector(
                     self.canvas.width * 0.25,
@@ -61,7 +61,7 @@
                 )
             }),
 
-            new asteroids.StaticAsteroid({
+            new asteroids.Asteroid({
                 game: self,
                 position: new SAT.Vector(
                     self.canvas.width * 0.75,
@@ -69,7 +69,7 @@
                 )
             }),
 
-            new asteroids.StaticAsteroid({
+            new asteroids.Asteroid({
                 game: self,
                 position: new SAT.Vector(
                     self.canvas.width * 0.25,
@@ -77,7 +77,7 @@
                 )
             }),
 
-            new asteroids.StaticAsteroid({
+            new asteroids.Asteroid({
                 game: self,
                 position: new SAT.Vector(
                     self.canvas.width * 0.75,

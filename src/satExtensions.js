@@ -30,6 +30,14 @@
 (function (SAT) {
     "use strict";
 
+    SAT.angleToNormal = function (angle) {
+        return new SAT.Vector(-Math.sin(angle), Math.cos(angle));
+    };
+
+    SAT.randomNormal = function () {
+        return SAT.angleToNormal(Math.random() * 2 * Math.PI);
+    };
+
     SAT.Vector.prototype.clamp = function (maximumMagnitude) {
         var self = this;
 
