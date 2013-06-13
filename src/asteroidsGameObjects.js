@@ -36,7 +36,12 @@
 
         self.game = args.game;
 
-        self.position = args.position;
+        if (args.position) {
+            self.position = _.clone(args.position);
+        } else {
+            self.position = new SAT.Vector(0, 0);
+        }
+
         self.rotation = args.rotation || 0;
 
         self.scale = args.scale;
@@ -44,7 +49,11 @@
         self.image = new Image();
         self.image.src = args.imageSrc;
 
-        self.velocity = args.velocity || new SAT.Vector(0, 0);
+        if (args.velocity) {
+            self.velocity = _.clone(args.velocity);
+        } else {
+            self.velocity = new SAT.Vector(0, 0);
+        }
     };
 
     asteroids.AsteroidsGameObject.prototype.draw = function () {
@@ -266,7 +275,7 @@
 
                 position: args.position,
                 velocity: SAT.randomNormal().scale(asteroidVelocityMagnitude),
-                scale: 128,
+                scale: args.scale || 128,
 
                 imageSrc: "media/asteroid.png"
 
@@ -282,6 +291,22 @@
 
         if (gameObject instanceof asteroids.Projectile) {
             self.kill();
+            gameObject.kill();
+
+            var minimumScale = 16;
+
+            if (self.scale <= minimumScale) {
+                return;
+            }
+
+            var asteroidArguments = {
+                game: self.game,
+                position: self.position,
+                scale: self.scale / 2
+            };
+
+            self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
+            self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
         }
     };
 }(window.asteroids = window.asteroids || {}));
