@@ -147,6 +147,14 @@
         return result;
     };
 
+    asteroids.Ship.prototype.collidedWith = function (gameObject) {
+        var self = this;
+
+        if (gameObject instanceof asteroids.Asteroid) {
+            self.game.restart();
+        }
+    };
+
     asteroids.Ship.prototype.accelerate = function () {
         var self = this;
 

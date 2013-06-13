@@ -43,6 +43,58 @@
         self.drawingFrameSize = 1000.0 / framesPerSecond;
         self.updateFrameSize = 1000.0 / updatesPerSecond;
 
+        $(window).keydown(function (event) {
+            self._recordKeyDown(event.which);
+        });
+
+        $(window).keyup(function (event) {
+            self._recordKeyUp(event.which);
+        });
+
+        self.restart();
+    };
+
+    asteroids.AsteroidsGame.prototype._recordKeyDown = function (code) {
+        var self = this;
+
+        self._keysDownDict[code] = true;
+    };
+
+    asteroids.AsteroidsGame.prototype._recordKeyUp = function (code) {
+        var self = this;
+
+        delete self._keysDownDict[code];
+    };
+
+    asteroids.AsteroidsGame.prototype.isKeyDown = function (code) {
+        var self = this;
+
+        return self._keysDownDict[code] === true;
+    };
+
+    asteroids.AsteroidsGame.prototype.draw = function () {
+        var self = this;
+
+        self.drawingContext.clearRect(0, 0, self.canvas.width, self.canvas.height);
+
+        _.each(self.gameObjects, function (gameObject) {
+            gameObject.draw();
+        });
+    };
+
+    asteroids.AsteroidsGame.prototype.update = function () {
+        var self = this;
+
+        self.detectCollisions();
+
+        _.each(self.gameObjects, function (gameObject) {
+            gameObject.update();
+        });
+    };
+
+    asteroids.AsteroidsGame.prototype.restart = function () {
+        var self = this;
+
         self.gameObjects = [
             new asteroids.Ship({
                 game: self,
@@ -85,52 +137,6 @@
                 )
             })
         ];
-
-        $(window).keydown(function (event) {
-            self._recordKeyDown(event.which);
-        });
-
-        $(window).keyup(function (event) {
-            self._recordKeyUp(event.which);
-        });
-    };
-
-    asteroids.AsteroidsGame.prototype._recordKeyDown = function (code) {
-        var self = this;
-
-        self._keysDownDict[code] = true;
-    };
-
-    asteroids.AsteroidsGame.prototype._recordKeyUp = function (code) {
-        var self = this;
-
-        delete self._keysDownDict[code];
-    };
-
-    asteroids.AsteroidsGame.prototype.isKeyDown = function (code) {
-        var self = this;
-
-        return self._keysDownDict[code] === true;
-    };
-
-    asteroids.AsteroidsGame.prototype.draw = function () {
-        var self = this;
-
-        self.drawingContext.clearRect(0, 0, self.canvas.width, self.canvas.height);
-
-        _.each(self.gameObjects, function (gameObject) {
-            gameObject.draw();
-        });
-    };
-
-    asteroids.AsteroidsGame.prototype.update = function () {
-        var self = this;
-
-        self.detectCollisions();
-
-        _.each(self.gameObjects, function (gameObject) {
-            gameObject.update();
-        });
     };
 
     asteroids.AsteroidsGame.prototype.detectCollisions = function () {
