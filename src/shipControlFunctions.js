@@ -83,7 +83,8 @@
 
         var euclideanDistance = asteroidOffset.len();
         var angularDistance = mathHelperFunctions.minAngularDifference(
-            ship.rotation, asteroid.rotation
+            ship.rotation,
+            asteroid.rotation
         );
 
         return euclideanDistance / ship.MAXIMUM_VELOCITY_MAGNITUDE +

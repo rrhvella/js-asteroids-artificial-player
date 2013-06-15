@@ -82,6 +82,14 @@
         });
     };
 
+    asteroids.AsteroidsGame.prototype.getAsteroids = function () {
+        var self = this;
+
+        return _.filter(self.gameObjects, function (gameObject) {
+            return gameObject instanceof asteroids.Asteroid;
+        });
+    };
+
     asteroids.AsteroidsGame.prototype.update = function () {
         var self = this;
 
