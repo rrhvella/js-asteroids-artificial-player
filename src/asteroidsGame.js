@@ -157,15 +157,23 @@
                 var firstObject = self.gameObjects[i];
                 var secondObject = self.gameObjects[j];
 
-                var firstCollider = firstObject.getCircleCollider();
-                var secondCollider = secondObject.getCircleCollider();
-
-                if (SAT.testCircleCircle(firstCollider, secondCollider)) {
+                if (self.testCollissionBetweenObjects(firstObject, secondObject)) {
                     firstObject.collidedWith(secondObject);
                     secondObject.collidedWith(firstObject);
                 }
             }
         }
+    };
+
+    asteroids.AsteroidsGame.prototype.testCollissionBetweenObjects = function (firstObject, secondObject) {
+        return _.any(firstObject.bodies, function (firstBody) {
+            return _.any(secondObject.bodies, function (secondBody) {
+                var firstCollider = firstBody.getCircleCollider();
+                var secondCollider = secondBody.getCircleCollider();
+
+                return SAT.testCircleCircle(firstCollider, secondCollider);
+            });
+        });
     };
 
     asteroids.AsteroidsGame.prototype.run = function () {

@@ -36,11 +36,7 @@
 
         self.game = args.game;
 
-        if (args.position) {
-            self.position = _.clone(args.position);
-        } else {
-            self.position = new SAT.Vector(0, 0);
-        }
+        self.position = objectHelpers.cloneOrDefault(args.position, new SAT.Vector(0, 0));
 
         self.rotation = args.rotation || 0;
 
@@ -49,11 +45,11 @@
         self.image = new Image();
         self.image.src = args.imageSrc;
 
-        if (args.velocity) {
-            self.velocity = _.clone(args.velocity);
-        } else {
-            self.velocity = new SAT.Vector(0, 0);
-        }
+        self.velocity = objectHelpers.cloneOrDefault(args.velocity, new SAT.Vector(0, 0));
+
+        self.bodies = [
+            new asteroids.AsteroidsGameObjectBody({ parent: self })
+        ];
     };
 
     asteroids.AsteroidsGameObject.prototype.draw = function () {
@@ -96,19 +92,35 @@
         self.game.gameObjects = _.without(self.game.gameObjects, self);
     };
 
-    asteroids.AsteroidsGameObject.prototype.getCircleCollider = function () {
-        var self = this;
-
-        return new SAT.Circle(self.position, self.getCircleColliderRadius());
-    };
-
-    asteroids.AsteroidsGameObject.prototype.getCircleColliderRadius = function () {
+    asteroids.AsteroidsGameObject.prototype.getEnclosingCircleRadius = function () {
         var self = this;
 
         return self.scale / 2;
     };
 
     asteroids.AsteroidsGameObject.prototype.collidedWith = function (gameObject) {
+    };
+
+    asteroids.AsteroidsGameObjectBody = function (args) {
+        var self = this;
+
+        self.parent = args.parent;
+        self.offsetFromParent = objectHelpers.cloneOrDefault(
+            args.offsetFromParent,
+            new SAT.Vector(0, 0)
+        );
+    };
+
+    asteroids.AsteroidsGameObjectBody.prototype.getCircleCollider = function () {
+        var self = this;
+
+        return new SAT.Circle(self.getOffsetPosition(), self.parent.getEnclosingCircleRadius());
+    };
+
+    asteroids.AsteroidsGameObjectBody.prototype.getOffsetPosition = function () {
+        var self = this;
+
+        return _.clone(self.parent.position).add(self.offsetFromParent)
     };
 
     asteroids.Ship = function (args) {

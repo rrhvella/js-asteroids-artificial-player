@@ -119,7 +119,7 @@
         var maxProjectileDistance = asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH *
             asteroids.Projectile.prototype.VELOCITY_MAGNITUDE;
 
-        var asteroidRadius = asteroid.getCircleColliderRadius();
+        var asteroidRadius = asteroid.getEnclosingCircleRadius();
 
         var distanceToCurrentOffset = asteroidOffset.len() - maxProjectileDistance - asteroidRadius;
         var lookAheadTime = distanceToCurrentOffset / (ship.MAXIMUM_VELOCITY_MAGNITUDE + asteroid.velocity.len());
@@ -145,13 +145,25 @@
     };
 
     asteroids._applyFireBehaviour = function (ship) {
-        var lineOfSightRay = new SAT.Ray(ship.position, ship.getHeading());
-
         var thereIsAnAsteroidWithinTheLineOfSight = _.any(
             ship.game.gameObjects,
             function (gameObject) {
-                return gameObject instanceof asteroids.Asteroid &&
-                    SAT.testRayCircle(lineOfSightRay, gameObject.getCircleCollider());
+                if (!gameObject instanceof asteroids.Asteroid) {
+                    return false;
+                }
+
+                var asteroid = gameObject;
+
+                return _.any(ship.bodies, function (shipBody) {
+                    return _.any(asteroid.bodies, function (asteroidBody) {
+                        var lineOfSightRay = new SAT.Ray(
+                            shipBody.getOffsetPosition(),
+                            ship.getHeading()
+                        );
+
+                        return SAT.testRayCircle(lineOfSightRay, asteroidBody.getCircleCollider());
+                    });
+                });
             }
         );
 

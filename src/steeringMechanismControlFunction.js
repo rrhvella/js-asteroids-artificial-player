@@ -92,7 +92,7 @@
     };
 
     asteroids._getOffsetToFiringDistance = function (ship, asteroid) {
-        var asteroidRadius = asteroid.getCircleColliderRadius();
+        var asteroidRadius = asteroid.getEnclosingCircleRadius();
 
         var maxProjectileDistance = asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH *
             asteroids.Projectile.prototype.VELOCITY_MAGNITUDE;
