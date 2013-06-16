@@ -149,7 +149,7 @@
     };
 
     asteroids.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.07;
-    asteroids.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 40;
+    asteroids.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 20;
 
     var brakingForceMagnitude = 2;
     asteroids.Ship.prototype.BRAKING_FORCE_MAGNITUDE = brakingForceMagnitude;
@@ -263,8 +263,8 @@
         self.timeToDeath = self.NUMBER_OF_FRAMES_TO_DEATH;
     };
 
-    asteroids.Projectile.prototype.VELOCITY_MAGNITUDE = 70;
-    asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 4;
+    asteroids.Projectile.prototype.VELOCITY_MAGNITUDE = 30;
+    asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 10;
 
     asteroids.Projectile.prototype.MAX_DISTANCE = asteroids.Projectile.prototype.VELOCITY_MAGNITUDE *
         asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH;
