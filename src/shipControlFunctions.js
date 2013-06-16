@@ -131,7 +131,7 @@
             normalizedShipRotation
         );
 
-        if (minAngularDifference < ship.ANGULAR_VELOCITY) {
+        if (minAngularDifference < ship.ANGULAR_VELOCITY / 2) {
             return;
         }
 
