@@ -301,34 +301,21 @@
 
         var viewWidth = self.game.canvas.width;
         var viewHeight = self.game.canvas.height;
+        var i;
+        var j;
 
-        self.bodies.push(
-            new asteroids.AsteroidsGameObjectBody({
-                parent: self,
-                offsetFromParent: new SAT.Vector(-viewWidth, -viewHeight)
-            })
-        );
-
-        self.bodies.push(
-            new asteroids.AsteroidsGameObjectBody({
-                parent: self,
-                offsetFromParent: new SAT.Vector(-viewWidth, viewHeight)
-            })
-        );
-
-        self.bodies.push(
-            new asteroids.AsteroidsGameObjectBody({
-                parent: self,
-                offsetFromParent: new SAT.Vector(viewWidth, -viewHeight)
-            })
-        );
-
-        self.bodies.push(
-            new asteroids.AsteroidsGameObjectBody({
-                parent: self,
-                offsetFromParent: new SAT.Vector(viewWidth, viewHeight)
-            })
-        );
+        for (i = -1; i <= 1; i += 1) {
+            for (j = -1; j <= 1; j += 1) {
+                if (i !== 0 || j !== 0) {
+                    self.bodies.push(
+                        new asteroids.AsteroidsGameObjectBody({
+                            parent: self,
+                            offsetFromParent: new SAT.Vector(viewWidth * i, viewHeight * j)
+                        })
+                    );
+                }
+            }
+        }
     };
 
     _.extend(asteroids.Asteroid.prototype, asteroids.AsteroidsGameObject.prototype);
