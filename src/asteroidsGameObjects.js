@@ -176,7 +176,7 @@
     asteroids.Ship.prototype.collidedWith = function (gameObject) {
         var self = this;
 
-        if (gameObject instanceof asteroids.Asteroid) {
+        if (gameObject.OBJECT_TYPE === asteroids.Asteroid.prototype.OBJECT_TYPE) {
             self.game.restart();
         }
     };
@@ -327,7 +327,7 @@
     asteroids.Asteroid.prototype.collidedWith = function (gameObject) {
         var self = this;
 
-        if (gameObject instanceof asteroids.Projectile) {
+        if (gameObject.OBJECT_TYPE === asteroids.Projectile.prototype.OBJECT_TYPE) {
             self.kill();
             gameObject.kill();
 
@@ -347,4 +347,9 @@
             self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
         }
     };
+
+    asteroids.Ship.prototype.OBJECT_TYPE = 1;
+    asteroids.Asteroid.prototype.OBJECT_TYPE = 2;
+    asteroids.Projectile.prototype.OBJECT_TYPE = 3;
+
 }(window.asteroids = window.asteroids || {}));

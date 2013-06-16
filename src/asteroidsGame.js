@@ -86,7 +86,7 @@
         var self = this;
 
         return _.filter(self.gameObjects, function (gameObject) {
-            return gameObject instanceof asteroids.Asteroid;
+            return gameObject.OBJECT_TYPE === asteroids.Asteroid.prototype.OBJECT_TYPE;
         });
     };
 

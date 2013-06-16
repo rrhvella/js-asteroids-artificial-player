@@ -74,9 +74,7 @@
     };
 
     asteroids._getClosestAsteroidBody = function (ship) {
-        var asteroidGameObjects = _.filter(ship.game.gameObjects, function (gameObject) {
-            return gameObject instanceof asteroids.Asteroid;
-        });
+        var asteroidGameObjects = ship.game.getAsteroids();
 
         var asteroidBodies = _.flatten(
             _.map(asteroidGameObjects, function (asteroid) {
@@ -176,12 +174,8 @@
 
     asteroids._applyFireBehaviour = function (ship) {
         var thereIsAnAsteroidWithinTheLineOfSight = _.any(
-            ship.game.gameObjects,
+            ship.game.getAsteroids(),
             function (gameObject) {
-                if (!(gameObject instanceof asteroids.Asteroid)) {
-                    return false;
-                }
-
                 var lineOfSightRay = new SAT.Ray(ship.position, ship.getHeading());
 
                 return _.any(gameObject.bodies, function (asteroidBody) {
