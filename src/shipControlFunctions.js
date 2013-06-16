@@ -108,7 +108,7 @@
         var bodyPosition = asteroidBody.getOffsetPosition();
 
         var bodyOffset = _.clone(bodyPosition).sub(ship.position);
-        var euclideanDistance = bodyOffset.len();
+        var euclideanDistance = bodyOffset.len() - asteroidBody.parent.getEnclosingCircleRadius();
 
         var angularDistance = mathHelperFunctions.minAngularDifference(
             ship.rotation,
