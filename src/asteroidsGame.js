@@ -51,6 +51,12 @@
             self._recordKeyUp(event.which);
         });
 
+        self._ignoredCollisions = {};
+        self.addIgnoredCollisionBetweenTypes(
+            asteroids.Asteroid.prototype.OBJECT_TYPE,
+            asteroids.Asteroid.prototype.OBJECT_TYPE
+        );
+
         self.restart();
     };
 
@@ -64,6 +70,29 @@
         var self = this;
 
         delete self._keysDownDict[code];
+    };
+
+    asteroids.AsteroidsGame.prototype.addIgnoredCollisionBetweenTypes = function (objectType1, objectType2) {
+        var self = this;
+
+        if (!(objectType1 in self._ignoredCollisions)) {
+            self._ignoredCollisions[objectType1] = {};
+        }
+
+        self._ignoredCollisions[objectType1][objectType2] = true;
+    };
+
+    asteroids.AsteroidsGame.prototype.collissionIgnoredBetweenObjects = function (object1, object2) {
+        var self = this;
+
+        var objectType1 = object1.OBJECT_TYPE;
+        var objectType2 = object2.OBJECT_TYPE;
+
+        if (!(objectType1 in self._ignoredCollisions)) {
+            return false;
+        }
+
+        return objectType2 in self._ignoredCollisions[objectType1];
     };
 
     asteroids.AsteroidsGame.prototype.isKeyDown = function (code) {
@@ -153,9 +182,13 @@
         var j;
 
         for (i = 0; i < self.gameObjects.length - 1; i += 1) {
-            for (j = 0; j < self.gameObjects.length; j += 1) {
+            for (j = i; j < self.gameObjects.length; j += 1) {
                 var firstObject = self.gameObjects[i];
                 var secondObject = self.gameObjects[j];
+
+                if (self.collissionIgnoredBetweenObjects(firstObject, secondObject)) {
+                    continue;
+                }
 
                 if (self.testCollissionBetweenObjects(firstObject, secondObject)) {
                     firstObject.collidedWith(secondObject);
