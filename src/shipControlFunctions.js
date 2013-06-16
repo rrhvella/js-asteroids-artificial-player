@@ -106,6 +106,15 @@
 
         var normalizedShipRotation = mathHelperFunctions.normalizeAngle(ship.rotation);
 
+        var minAngularDifference = mathHelperFunctions.minAngularDifference(
+            normalizedAsteroidRotation,
+            normalizedShipRotation
+        );
+
+        if (minAngularDifference < ship.ANGULAR_VELOCITY) {
+            return;
+        }
+
         if (normalizedAsteroidRotation > normalizedShipRotation) {
             if (normalizedAsteroidRotation - normalizedShipRotation <= Math.PI) {
                 ship.turn(1);
