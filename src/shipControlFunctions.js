@@ -161,14 +161,13 @@
         var thereIsAnAsteroidWithinTheLineOfSight = _.any(
             ship.game.gameObjects,
             function (gameObject) {
-                if (!gameObject instanceof asteroids.Asteroid) {
+                if (!(gameObject instanceof asteroids.Asteroid)) {
                     return false;
                 }
 
                 var lineOfSightRay = new SAT.Ray(ship.position, ship.getHeading());
 
                 return _.any(gameObject.bodies, function (asteroidBody) {
-
                     return SAT.testRayCircle(lineOfSightRay, asteroidBody.getCircleCollider());
                 });
             }
