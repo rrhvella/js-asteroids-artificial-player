@@ -97,18 +97,9 @@
 
     asteroids._getFuturePosition = function (ship, asteroidBody) {
         var bodyPosition = asteroidBody.getOffsetPosition();
-        var bodyOffset = _.clone(bodyPosition).sub(ship.position);
-
-        var maxProjectileDistance = asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH *
-            asteroids.Projectile.prototype.VELOCITY_MAGNITUDE;
-
-        var asteroidRadius = asteroidBody.parent.getEnclosingCircleRadius();
         var asteroidVelocity = asteroidBody.parent.velocity;
 
-        var distanceToCurrentOffset = bodyOffset.len() - maxProjectileDistance - asteroidRadius;
-        var lookAheadTime = distanceToCurrentOffset / (ship.MAXIMUM_VELOCITY_MAGNITUDE +
-            asteroidVelocity.len());
-
+        var lookAheadTime = asteroids._combinedAsteroidBodyDistance(ship, asteroidBody);
         return _.clone(asteroidVelocity).scale(lookAheadTime).add(bodyPosition);
     };
 
