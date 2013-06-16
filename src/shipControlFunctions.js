@@ -52,23 +52,27 @@
     };
 
     asteroids._applyPursuitBehaviour = function (ship) {
-        var closestAsteroid = asteroids._getClosestAsteroid(ship);
+        var closestAsteroidBody = asteroids._getClosestAsteroidBody(ship);
 
-        if (closestAsteroid === null) {
+        if (closestAsteroidBody === null) {
             return;
         }
 
-        asteroids._turnShipTowardsAsteroid(ship, closestAsteroid);
-        asteroids._approachAsteroid(ship, closestAsteroid);
+        asteroids._turnShipTowardsAsteroidBody(ship, closestAsteroidBody);
+        asteroids._approachAsteroidBody(ship, closestAsteroidBody);
     };
 
-    asteroids._getClosestAsteroid = function (ship) {
+    asteroids._getClosestAsteroidBody = function (ship) {
         var asteroidGameObjects = _.filter(ship.game.gameObjects, function (gameObject) {
             return gameObject instanceof asteroids.Asteroid;
         });
 
-        var closestAsteroid = _.min(asteroidGameObjects, function (asteroid) {
-            return asteroids._combinedAsteroidDistance(ship, asteroid);
+        var asteroidBodies = _.flatten(
+            _.map(asteroidGameObjects, function (asteroid) { return asteroid.bodies; })
+        );
+
+        var closestAsteroid = _.min(asteroidBodies, function (asteroidBody) {
+            return asteroids._combinedAsteroidBodyDistance(ship, asteroidBody);
         });
 
         if (closestAsteroid === Infinity) {
@@ -78,22 +82,24 @@
         return closestAsteroid;
     };
 
-    asteroids._combinedAsteroidDistance = function (ship, asteroid) {
-        var asteroidOffset = _.clone(asteroid.position).sub(ship.position);
+    asteroids._combinedAsteroidBodyDistance = function (ship, asteroidBody) {
+        var bodyPosition = asteroidBody.getOffsetPosition();
 
-        var euclideanDistance = asteroidOffset.len();
+        var bodyOffset = _.clone(bodyPosition).sub(ship.position);
+        var euclideanDistance = bodyOffset.len();
+
         var angularDistance = mathHelperFunctions.minAngularDifference(
             ship.rotation,
-            asteroid.rotation
+            bodyOffset.angle()
         );
 
         return euclideanDistance / ship.MAXIMUM_VELOCITY_MAGNITUDE +
             angularDistance / ship.ANGULAR_VELOCITY;
     };
 
-    asteroids._turnShipTowardsAsteroid = function (ship, asteroid) {
+    asteroids._turnShipTowardsAsteroidBody = function (ship, asteroidBody) {
         var normalizedAsteroidRotation = mathHelperFunctions.normalizeAngle(
-            asteroid.position.angleInRelationTo(ship.position)
+            asteroidBody.getOffsetPosition().angleInRelationTo(ship.position)
         );
 
         var normalizedShipRotation = mathHelperFunctions.normalizeAngle(ship.rotation);
@@ -113,23 +119,26 @@
         }
     };
 
-    asteroids._approachAsteroid = function (ship, asteroid) {
-        var asteroidOffset = _.clone(asteroid.position).sub(ship.position);
+    asteroids._approachAsteroidBody = function (ship, asteroidBody) {
+        var bodyPosition = asteroidBody.getOffsetPosition();
+        var bodyOffset = _.clone(bodyPosition).sub(ship.position);
 
         var maxProjectileDistance = asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH *
             asteroids.Projectile.prototype.VELOCITY_MAGNITUDE;
 
-        var asteroidRadius = asteroid.getEnclosingCircleRadius();
+        var asteroidRadius = asteroidBody.parent.getEnclosingCircleRadius();
+        var asteroidVelocity = asteroidBody.parent.velocity;
 
-        var distanceToCurrentOffset = asteroidOffset.len() - maxProjectileDistance - asteroidRadius;
-        var lookAheadTime = distanceToCurrentOffset / (ship.MAXIMUM_VELOCITY_MAGNITUDE + asteroid.velocity.len());
+        var distanceToCurrentOffset = bodyOffset.len() - maxProjectileDistance - asteroidRadius;
+        var lookAheadTime = distanceToCurrentOffset / (ship.MAXIMUM_VELOCITY_MAGNITUDE +
+                                asteroidVelocity.len());
 
-        var futureAsteroidPosition = _.clone(asteroid.velocity).scale(lookAheadTime)
-                                      .add(asteroid.position);
+        var futureBodyPosition = _.clone(asteroidVelocity).scale(lookAheadTime)
+                                      .add(bodyPosition);
 
-        var futureAsteroidOffset = _.clone(futureAsteroidPosition).sub(ship.position);
+        var futureBodyOffset = _.clone(futureBodyPosition).sub(ship.position);
 
-        var distanceToFutureOffset = futureAsteroidOffset.len() - maxProjectileDistance - asteroidRadius;
+        var distanceToFutureOffset = futureBodyOffset.len() - maxProjectileDistance - asteroidRadius;
 
         if (distanceToFutureOffset <= 0) {
             return;
@@ -152,17 +161,11 @@
                     return false;
                 }
 
-                var asteroid = gameObject;
+                var lineOfSightRay = new SAT.Ray(ship.position, ship.getHeading());
 
-                return _.any(ship.bodies, function (shipBody) {
-                    return _.any(asteroid.bodies, function (asteroidBody) {
-                        var lineOfSightRay = new SAT.Ray(
-                            shipBody.getOffsetPosition(),
-                            ship.getHeading()
-                        );
+                return _.any(gameObject.bodies, function (asteroidBody) {
 
-                        return SAT.testRayCircle(lineOfSightRay, asteroidBody.getCircleCollider());
-                    });
+                    return SAT.testRayCircle(lineOfSightRay, asteroidBody.getCircleCollider());
                 });
             }
         );

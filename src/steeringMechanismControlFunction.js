@@ -82,7 +82,7 @@
     };
 
     asteroids._getPirsuitForce = function (ship) {
-        var closestAsteroid = asteroids._getClosestAsteroid(ship);
+        var closestAsteroid = asteroids._getClosestAsteroidBody(ship);
 
         if (closestAsteroid === null) {
             return new SAT.Vector(0, 0);
@@ -111,7 +111,7 @@
     };
 
     asteroids._getLookAheadTime = function (ship, asteroid) {
-        return asteroids._combinedAsteroidDistance(ship, asteroid) /
+        return asteroids._combinedAsteroidBodyDistance(ship, asteroid) /
             (ship.MAXIMUM_VELOCITY_MAGNITUDE + asteroid.velocity.len());
     };
 

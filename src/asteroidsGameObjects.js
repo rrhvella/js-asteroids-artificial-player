@@ -47,9 +47,7 @@
 
         self.velocity = objectHelpers.cloneOrDefault(args.velocity, new SAT.Vector(0, 0));
 
-        self.bodies = [
-            new asteroids.AsteroidsGameObjectBody({ parent: self })
-        ];
+        self.bodies = [ new asteroids.AsteroidsGameObjectBody({ parent: self }) ];
     };
 
     asteroids.AsteroidsGameObject.prototype.draw = function () {
@@ -72,16 +70,23 @@
         var x = self.position.x;
         var y = self.position.y;
 
-        var canvasWidth = self.game.canvas.width;
-        var canvasHeight = self.game.canvas.height;
+        var viewWidth = self.game.canvas.width;
+        var viewHeight = self.game.canvas.height;
 
-        if (x - self.scale > canvasWidth || x + self.scale <= 0) {
-            self.position.x = canvasWidth - x;
+        if (x - self.scale > viewWidth) {
+            x = 0;
+        } else if (x + self.scale <= 0) {
+            x = viewWidth - x - self.scale;
         }
 
-        if (y - self.scale > canvasHeight || y + self.scale <= 0) {
-            self.position.y = canvasHeight - y;
+        if (y - self.scale > viewHeight) {
+            y = 0;
+        } else if (y + self.scale <= 0) {
+            y = viewHeight - y - self.scale;
         }
+
+        self.position.x = x;
+        self.position.y = y;
 
         self.position.add(self.velocity);
     };
@@ -292,6 +297,37 @@
                 imageSrc: "media/asteroid.png"
 
             }
+        );
+
+        var viewWidth = self.game.canvas.width;
+        var viewHeight = self.game.canvas.height;
+
+        self.bodies.push(
+            new asteroids.AsteroidsGameObjectBody({
+                parent: self,
+                offsetFromParent: new SAT.Vector(-viewWidth, -viewHeight)
+            })
+        );
+
+        self.bodies.push(
+            new asteroids.AsteroidsGameObjectBody({
+                parent: self,
+                offsetFromParent: new SAT.Vector(-viewWidth, viewHeight)
+            })
+        );
+
+        self.bodies.push(
+            new asteroids.AsteroidsGameObjectBody({
+                parent: self,
+                offsetFromParent: new SAT.Vector(viewWidth, -viewHeight)
+            })
+        );
+
+        self.bodies.push(
+            new asteroids.AsteroidsGameObjectBody({
+                parent: self,
+                offsetFromParent: new SAT.Vector(viewWidth, viewHeight)
+            })
         );
     };
 
