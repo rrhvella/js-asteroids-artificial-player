@@ -264,7 +264,7 @@
     };
 
     asteroids.Projectile.prototype.VELOCITY_MAGNITUDE = 70;
-    asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 2;
+    asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 4;
 
     _.extend(asteroids.Projectile.prototype, asteroids.AsteroidsGameObject.prototype);
     asteroids.Projectile.prototype.constructor = asteroids.Projectile;
