@@ -266,6 +266,9 @@
     asteroids.Projectile.prototype.VELOCITY_MAGNITUDE = 70;
     asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 4;
 
+    asteroids.Projectile.prototype.MAX_DISTANCE = asteroids.Projectile.prototype.VELOCITY_MAGNITUDE *
+        asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH;
+
     _.extend(asteroids.Projectile.prototype, asteroids.AsteroidsGameObject.prototype);
     asteroids.Projectile.prototype.constructor = asteroids.Projectile;
 

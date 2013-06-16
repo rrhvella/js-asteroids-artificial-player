@@ -58,8 +58,19 @@
             return;
         }
 
-        asteroids._turnShipTowardsAsteroidBody(ship, closestAsteroidBody);
-        asteroids._approachAsteroidBody(ship, closestAsteroidBody);
+        var closestBodyFuturePosition = asteroids._getFuturePosition(ship, closestAsteroidBody);
+
+        asteroids._turnShipTowardsFutureAsteroidBody(
+            ship,
+            closestAsteroidBody,
+            closestBodyFuturePosition
+        );
+
+        asteroids._approachFutureAsteroidBody(
+            ship,
+            closestAsteroidBody,
+            closestBodyFuturePosition
+        );
     };
 
     asteroids._getClosestAsteroidBody = function (ship) {
@@ -84,6 +95,24 @@
         return closestAsteroid;
     };
 
+    asteroids._getFuturePosition = function (ship, asteroidBody) {
+        var bodyPosition = asteroidBody.getOffsetPosition();
+        var bodyOffset = _.clone(bodyPosition).sub(ship.position);
+
+        var maxProjectileDistance = asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH *
+            asteroids.Projectile.prototype.VELOCITY_MAGNITUDE;
+
+        var asteroidRadius = asteroidBody.parent.getEnclosingCircleRadius();
+        var asteroidVelocity = asteroidBody.parent.velocity;
+
+        var distanceToCurrentOffset = bodyOffset.len() - maxProjectileDistance - asteroidRadius;
+        var lookAheadTime = distanceToCurrentOffset / (ship.MAXIMUM_VELOCITY_MAGNITUDE +
+            asteroidVelocity.len());
+
+        return _.clone(asteroidVelocity).scale(lookAheadTime).add(bodyPosition);
+    };
+
+
     asteroids._combinedAsteroidBodyDistance = function (ship, asteroidBody) {
         var bodyPosition = asteroidBody.getOffsetPosition();
 
@@ -99,9 +128,9 @@
             angularDistance / ship.ANGULAR_VELOCITY;
     };
 
-    asteroids._turnShipTowardsAsteroidBody = function (ship, asteroidBody) {
+    asteroids._turnShipTowardsFutureAsteroidBody = function (ship, asteroidBody, futurePosition) {
         var normalizedAsteroidRotation = mathHelperFunctions.normalizeAngle(
-            asteroidBody.getOffsetPosition().angleInRelationTo(ship.position)
+            futurePosition.angleInRelationTo(ship.position)
         );
 
         var normalizedShipRotation = mathHelperFunctions.normalizeAngle(ship.rotation);
@@ -130,28 +159,16 @@
         }
     };
 
-    asteroids._approachAsteroidBody = function (ship, asteroidBody) {
-        var bodyPosition = asteroidBody.getOffsetPosition();
-        var bodyOffset = _.clone(bodyPosition).sub(ship.position);
-
-        var maxProjectileDistance = asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH *
-            asteroids.Projectile.prototype.VELOCITY_MAGNITUDE;
-
-        var asteroidRadius = asteroidBody.parent.getEnclosingCircleRadius();
-        var asteroidVelocity = asteroidBody.parent.velocity;
-
-        var distanceToCurrentOffset = bodyOffset.len() - maxProjectileDistance - asteroidRadius;
-        var lookAheadTime = distanceToCurrentOffset / (ship.MAXIMUM_VELOCITY_MAGNITUDE +
-            asteroidVelocity.len());
-
-        var futureBodyPosition = _.clone(asteroidVelocity).scale(lookAheadTime)
-            .add(bodyPosition);
-
-        var futureBodyOffset = _.clone(futureBodyPosition).sub(ship.position);
+    asteroids._approachFutureAsteroidBody = function (ship, asteroidBody, futurePosition) {
+        var futureOffset = _.clone(futurePosition).sub(ship.position);
 
         var shipProximityFactor = 0.75;
-        var distanceToFutureOffset = futureBodyOffset.len() - maxProjectileDistance *
-            shipProximityFactor - asteroidRadius;
+
+        var asteroidRadius = asteroidBody.parent.getEnclosingCircleRadius();
+        var alteredProjectileDistance = asteroids.Projectile.prototype.MAX_DISTANCE * shipProximityFactor;
+
+
+        var distanceToFutureOffset = futureOffset.len() - alteredProjectileDistance - asteroidRadius;
 
         if (distanceToFutureOffset <= 0) {
             return;
