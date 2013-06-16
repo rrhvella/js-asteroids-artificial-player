@@ -68,7 +68,9 @@
         });
 
         var asteroidBodies = _.flatten(
-            _.map(asteroidGameObjects, function (asteroid) { return asteroid.bodies; })
+            _.map(asteroidGameObjects, function (asteroid) {
+                return asteroid.bodies;
+            })
         );
 
         var closestAsteroid = _.min(asteroidBodies, function (asteroidBody) {
@@ -131,14 +133,16 @@
 
         var distanceToCurrentOffset = bodyOffset.len() - maxProjectileDistance - asteroidRadius;
         var lookAheadTime = distanceToCurrentOffset / (ship.MAXIMUM_VELOCITY_MAGNITUDE +
-                                asteroidVelocity.len());
+            asteroidVelocity.len());
 
         var futureBodyPosition = _.clone(asteroidVelocity).scale(lookAheadTime)
-                                      .add(bodyPosition);
+            .add(bodyPosition);
 
         var futureBodyOffset = _.clone(futureBodyPosition).sub(ship.position);
 
-        var distanceToFutureOffset = futureBodyOffset.len() - maxProjectileDistance - asteroidRadius;
+        var shipProximityFactor = 0.75;
+        var distanceToFutureOffset = futureBodyOffset.len() - maxProjectileDistance *
+            shipProximityFactor - asteroidRadius;
 
         if (distanceToFutureOffset <= 0) {
             return;
