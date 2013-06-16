@@ -341,7 +341,7 @@
             self.kill();
             gameObject.kill();
 
-            var minimumScale = 16;
+            var minimumScale = 32;
 
             if (self.scale <= minimumScale) {
                 return;
