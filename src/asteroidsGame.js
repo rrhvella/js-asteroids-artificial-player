@@ -59,8 +59,6 @@
             asteroids.Asteroid.prototype.OBJECT_TYPE,
             asteroids.Asteroid.prototype.OBJECT_TYPE
         );
-
-        self.restart();
     };
 
     asteroids.AsteroidsGame.prototype.setCanvas = function (canvas) {
@@ -123,6 +121,23 @@
         var self = this;
 
         delete self._keysDownDict[code];
+    };
+
+    asteroids.AsteroidsGame.prototype.playGame = function () {
+        var self = this;
+
+        self.restart();
+        var ticks = 0;
+
+        while (self._gameWon === null) {
+            self.update();
+            ticks += 1;
+        }
+
+        return {
+            gameWon: self._gameWon,
+            playTimeInTicks: ticks
+        };
     };
 
     asteroids.AsteroidsGame.prototype.addIgnoredCollisionBetweenTypes = function (objectType1, objectType2) {
@@ -227,6 +242,8 @@
                 )
             })
         ];
+
+        self._gameWon = null;
     };
 
     asteroids.AsteroidsGame.prototype.detectCollisions = function () {
@@ -265,7 +282,15 @@
     asteroids.AsteroidsGame.prototype.run = function () {
         var self = this;
 
+        self.restart();
+
         setInterval(_.bind(self.draw, self), self.drawingFrameSize);
         setInterval(_.bind(self.update, self), self.updateFrameSize);
+    };
+
+    asteroids.AsteroidsGame.prototype.gameOver = function (args) {
+        var self = this;
+
+        self._gameWon = args.won || false;
     };
 }(window.asteroids = window.asteroids || {}));

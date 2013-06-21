@@ -179,7 +179,7 @@
         var self = this;
 
         if (gameObject.OBJECT_TYPE === asteroids.Asteroid.prototype.OBJECT_TYPE) {
-            self.game.restart();
+            self.game.gameOver({won: false});
         }
     };
 
@@ -333,17 +333,19 @@
             var minimumScale = 32;
 
             if (self.scale <= minimumScale) {
-                return;
+                if (self.game.getAsteroids().length === 0) {
+                    self.game.gameOver({won: true});
+                }
+            } else {
+                var asteroidArguments = {
+                    game: self.game,
+                    position: self.position,
+                    scale: self.scale / 2
+                };
+
+                self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
+                self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
             }
-
-            var asteroidArguments = {
-                game: self.game,
-                position: self.position,
-                scale: self.scale / 2
-            };
-
-            self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
-            self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
         }
     };
 
