@@ -131,7 +131,7 @@
     asteroids.Ship = function (args) {
         var self = this;
 
-        self._shootingIntervalPassed = true;
+        self._timeLeftToShoot = 0;
         self.controlFunction = args.controlFunction;
 
         asteroids.AsteroidsGameObject.call(
@@ -201,6 +201,10 @@
         self.controlFunction(self);
         self.brake();
 
+        if (self._timeLeftToShoot > 0) {
+            self._timeLeftToShoot -= 1;
+        }
+
         asteroids.AsteroidsGameObject.prototype.update.call(self);
     };
 
@@ -223,7 +227,7 @@
     asteroids.Ship.prototype.fire = function () {
         var self = this;
 
-        if (!self._shootingIntervalPassed) {
+        if (self._timeLeftToShoot !== 0) {
             return;
         }
 
@@ -236,14 +240,7 @@
             })
         );
 
-        self._shootingIntervalPassed = false;
-
-        setTimeout(
-            function () {
-                self._shootingIntervalPassed = true;
-            },
-            self.game.updateFrameSize * 5
-        );
+        self._timeLeftToShoot = 5;
     };
 
     asteroids.Projectile = function (args) {
