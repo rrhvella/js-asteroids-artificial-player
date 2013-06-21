@@ -31,28 +31,29 @@
 $(document).ready(function () {
     "use strict";
 
-    var numberOfGamesToPlay = 40;
+    var numberOfGames = 40;
     var asteroidsGame = new asteroids.AsteroidsGame({ width: 800, height: 600 });
 
     var gamesWon = 0;
 
     var i;
 
-    for (i = 0; i < numberOfGamesToPlay; i += 1) {
+    for (i = 0; i < numberOfGames; i += 1) {
         var stats = asteroidsGame.playGame();
 
         gamesWon += (stats.gameWon === true) ? 1 : 0;
     }
 
-    var ratioOfGamesWon = gamesWon / numberOfGamesToPlay;
+    var ratioOfGamesWon = gamesWon / numberOfGames;
     var confidenceLevel = 0.95;
 
-    var marginOfError = 1.96 / (2 * Math.sqrt(numberOfGamesToPlay));
+    var marginOfError = 1.96 / (2 * Math.sqrt(numberOfGames));
 
     var formatAsPercentage = function (ratio) {
         return ratio.toFixed(2) * 100 + "%";
     };
 
+    $("div#numberOfGames").text(numberOfGames);
     $("div#percentageOfGamesWon").text(formatAsPercentage(ratioOfGamesWon));
     $("div#confidenceLevel").text(formatAsPercentage(confidenceLevel));
     $("div#marginOfError").text(formatAsPercentage(marginOfError));
