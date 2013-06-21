@@ -31,6 +31,11 @@
 $(document).ready(function () {
     "use strict";
 
-    var asteroidsGame = new asteroids.AsteroidsGame({ canvas: $("canvas#main")[0] });
+    var asteroidsGame = new asteroids.AsteroidsGame({
+        width: 800,
+        height: 600,
+        canvas: $("canvas#main")[0]
+    });
+
     asteroidsGame.run();
 });

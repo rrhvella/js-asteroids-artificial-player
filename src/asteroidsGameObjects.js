@@ -53,15 +53,17 @@
     asteroids.AsteroidsGameObject.prototype.draw = function () {
         var self = this;
 
-        self.game.drawingContext.translate(self.position.x, self.position.y);
-        self.game.drawingContext.rotate(self.rotation);
-        self.game.drawingContext.scale(self.scale, self.scale);
+        var drawingContext = self.game.getDrawingContext();
 
-        self.game.drawingContext.translate(-0.5, -0.5);
+        drawingContext.translate(self.position.x, self.position.y);
+        drawingContext.rotate(self.rotation);
+        drawingContext.scale(self.scale, self.scale);
 
-        self.game.drawingContext.drawImage(self.image, 0, 0, 1, 1);
+        drawingContext.translate(-0.5, -0.5);
 
-        twoDContextHelperFunctions.resetTransform(self.game.drawingContext);
+        drawingContext.drawImage(self.image, 0, 0, 1, 1);
+
+        twoDContextHelperFunctions.resetTransform(drawingContext);
     };
 
     asteroids.AsteroidsGameObject.prototype.update = function () {
@@ -70,8 +72,8 @@
         var x = self.position.x;
         var y = self.position.y;
 
-        var viewWidth = self.game.canvas.width;
-        var viewHeight = self.game.canvas.height;
+        var viewWidth = self.game.getWidth();
+        var viewHeight = self.game.getHeight();
 
         if (x - self.scale > viewWidth) {
             x = 0;
@@ -299,8 +301,8 @@
             }
         );
 
-        var viewWidth = self.game.canvas.width;
-        var viewHeight = self.game.canvas.height;
+        var viewWidth = self.game.getWidth();
+        var viewHeight = self.game.getHeight();
         var i;
         var j;
 

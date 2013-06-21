@@ -36,8 +36,11 @@
         var framesPerSecond = 30;
         var updatesPerSecond = 20;
 
-        self.canvas = args.canvas;
-        self.drawingContext = self.canvas.getContext("2d");
+        self.setCanvas(args.canvas);
+
+        self.setWidth(args.width);
+        self.setHeight(args.height);
+
         self._keysDownDict = {};
 
         self.drawingFrameSize = 1000.0 / framesPerSecond;
@@ -58,6 +61,56 @@
         );
 
         self.restart();
+    };
+
+    asteroids.AsteroidsGame.prototype.setCanvas = function (canvas) {
+        var self = this;
+
+        self._canvas = canvas;
+
+        if (canvas) {
+            self._drawingContext = self._canvas.getContext("2d");
+        } else {
+            self._drawingContext = null;
+        }
+    };
+
+    asteroids.AsteroidsGame.prototype.getDrawingContext = function () {
+        var self = this;
+
+        return self._drawingContext;
+    };
+
+    asteroids.AsteroidsGame.prototype.getWidth = function () {
+        var self = this;
+
+        return self._width;
+    };
+
+    asteroids.AsteroidsGame.prototype.getHeight = function () {
+        var self = this;
+
+        return self._height;
+    };
+
+    asteroids.AsteroidsGame.prototype.setWidth = function (width) {
+        var self = this;
+
+        self._width = width;
+
+        if (self._canvas) {
+            self._canvas.width = self._width;
+        }
+    };
+
+    asteroids.AsteroidsGame.prototype.setHeight = function (height) {
+        var self = this;
+
+        self._height = height;
+
+        if (self._canvas) {
+            self._canvas.height = self._height;
+        }
     };
 
     asteroids.AsteroidsGame.prototype._recordKeyDown = function (code) {
@@ -104,7 +157,7 @@
     asteroids.AsteroidsGame.prototype.draw = function () {
         var self = this;
 
-        self.drawingContext.clearRect(0, 0, self.canvas.width, self.canvas.height);
+        self._drawingContext.clearRect(0, 0, self._canvas.width, self._canvas.height);
 
         _.each(self.gameObjects, function (gameObject) {
             gameObject.draw();
@@ -136,8 +189,8 @@
             new asteroids.Ship({
                 game: self,
                 position: new SAT.Vector(
-                    self.canvas.width * 0.5,
-                    self.canvas.height * 0.5
+                    self._width * 0.5,
+                    self._height * 0.5
                 ),
                 controlFunction: asteroids.AIControlFunction
             }),
@@ -145,32 +198,32 @@
             new asteroids.Asteroid({
                 game: self,
                 position: new SAT.Vector(
-                    self.canvas.width * 0.25,
-                    self.canvas.height * 0.25
+                    self._width * 0.25,
+                    self._height * 0.25
                 )
             }),
 
             new asteroids.Asteroid({
                 game: self,
                 position: new SAT.Vector(
-                    self.canvas.width * 0.75,
-                    self.canvas.height * 0.25
+                    self._width * 0.75,
+                    self._height * 0.25
                 )
             }),
 
             new asteroids.Asteroid({
                 game: self,
                 position: new SAT.Vector(
-                    self.canvas.width * 0.25,
-                    self.canvas.height * 0.75
+                    self._width * 0.25,
+                    self._height * 0.75
                 )
             }),
 
             new asteroids.Asteroid({
                 game: self,
                 position: new SAT.Vector(
-                    self.canvas.width * 0.75,
-                    self.canvas.height * 0.75
+                    self._width * 0.75,
+                    self._height * 0.75
                 )
             })
         ];
