@@ -168,7 +168,7 @@
 
         self._debugFutureAsteroidBodyPosition = closestBodyFuturePosition;
 
-        var futureBodyOffset = closestBodyFuturePosition.sub(self.ship.position);
+        var futureBodyOffset = _.clone(closestBodyFuturePosition).sub(self.ship.position);
         var forceMagnitude = futureBodyOffset.len() -
             closestAsteroidBody.parent.getEnclosingCircleRadius() -
             self.ship.getEnclosingCircleRadius();
