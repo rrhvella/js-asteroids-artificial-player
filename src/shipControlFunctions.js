@@ -163,15 +163,26 @@
             return new SAT.Vector(0, 0);
         }
 
+        var shipVelocityMagnitude = self.ship.velocity.len();
+
         self._debugClosestAsteroid = closestAsteroidBody.parent;
         var closestBodyFuturePosition = self._getFuturePosition(closestAsteroidBody);
 
         self._debugFutureAsteroidBodyPosition = closestBodyFuturePosition;
 
         var futureBodyOffset = _.clone(closestBodyFuturePosition).sub(self.ship.position);
+        var shipProximityFactor = 0.75;
+
+        var asteroidRadius = closestAsteroidBody.parent.getEnclosingCircleRadius();
+        var shipRadius = self.ship.getEnclosingCircleRadius();
+        var alteredProjectileDistance = asteroids.Projectile.prototype.MAX_DISTANCE * shipProximityFactor;
+
         var forceMagnitude = futureBodyOffset.len() -
-            closestAsteroidBody.parent.getEnclosingCircleRadius() -
-            self.ship.getEnclosingCircleRadius();
+            asteroidRadius - shipRadius - alteredProjectileDistance;
+
+        if (shipVelocityMagnitude > forceMagnitude) {
+            forceMagnitude = shipVelocityMagnitude;
+        }
 
         return futureBodyOffset.normalize().scale(forceMagnitude);
     };
