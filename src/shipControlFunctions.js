@@ -160,7 +160,7 @@
         if (closestAsteroidBody === null) {
             self._debugClosestAsteroid = null;
 
-            return;
+            return new SAT.Vector(0, 0);
         }
 
         self._debugClosestAsteroid = closestAsteroidBody.parent;
