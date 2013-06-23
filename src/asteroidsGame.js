@@ -200,14 +200,20 @@
     asteroids.AsteroidsGame.prototype.restart = function () {
         var self = this;
 
+        var ship = new asteroids.Ship({
+            game: self,
+            position: new SAT.Vector(
+                self._width * 0.5,
+                self._height * 0.5
+            )
+        });
+
         self.gameObjects = [
-            new asteroids.Ship({
+            ship,
+
+            new asteroids.AIControlFunction({
                 game: self,
-                position: new SAT.Vector(
-                    self._width * 0.5,
-                    self._height * 0.5
-                ),
-                controlFunction: asteroids.AIControlFunction
+                ship: ship
             }),
 
             new asteroids.Asteroid({
@@ -252,9 +258,19 @@
         var j;
 
         for (i = 0; i < self.gameObjects.length - 1; i += 1) {
+            var firstObject = self.gameObjects[i];
+
+            if (!firstObject.bodies) {
+                continue;
+            }
+
+
             for (j = i; j < self.gameObjects.length; j += 1) {
-                var firstObject = self.gameObjects[i];
                 var secondObject = self.gameObjects[j];
+
+                if (!secondObject.bodies) {
+                    continue;
+                }
 
                 if (self.collissionIgnoredBetweenObjects(firstObject, secondObject)) {
                     continue;

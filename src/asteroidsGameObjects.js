@@ -134,7 +134,6 @@
         var self = this;
 
         self._timeLeftToShoot = 0;
-        self.controlFunction = args.controlFunction;
 
         asteroids.AsteroidsGameObject.call(
             self,
@@ -200,7 +199,6 @@
     asteroids.Ship.prototype.update = function () {
         var self = this;
 
-        self.controlFunction(self);
         self.brake();
 
         if (self._timeLeftToShoot > 0) {

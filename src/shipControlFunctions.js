@@ -30,51 +30,49 @@
 (function (asteroids) {
     "use strict";
 
-    asteroids.HumanInputControlFunction = function (ship) {
-        if (ship.game.isKeyDown(asteroids.KeyCodes.UP)) {
-            ship.accelerate();
-        }
+    asteroids.AIControlFunction = function (args) {
+        var self = this;
 
-        if (ship.game.isKeyDown(asteroids.KeyCodes.RIGHT)) {
-            ship.turn(1);
-        } else if (ship.game.isKeyDown(asteroids.KeyCodes.LEFT)) {
-            ship.turn(-1);
-        }
-
-        if (ship.game.isKeyDown(asteroids.KeyCodes.SPACE)) {
-            ship.fire();
-        }
+        self.ship = args.ship;
+        self.game = args.game;
     };
 
-    asteroids.AIControlFunction = function (ship) {
-        asteroids._applyPursuitBehaviour(ship);
-        asteroids._applyFireBehaviour(ship);
+    asteroids.AIControlFunction.prototype.draw = function () {
     };
 
-    asteroids._applyPursuitBehaviour = function (ship) {
-        var closestAsteroidBody = asteroids._getClosestAsteroidBody(ship);
+    asteroids.AIControlFunction.prototype.update = function () {
+        var self = this;
+
+        self._applyPursuitBehaviour();
+        self._applyFireBehaviour();
+    };
+
+    asteroids.AIControlFunction.prototype._applyPursuitBehaviour = function () {
+        var self = this;
+
+        var closestAsteroidBody = self._getClosestAsteroidBody();
 
         if (closestAsteroidBody === null) {
             return;
         }
 
-        var closestBodyFuturePosition = asteroids._getFuturePosition(ship, closestAsteroidBody);
+        var closestBodyFuturePosition = self._getFuturePosition(closestAsteroidBody);
 
-        asteroids._turnShipTowardsFutureAsteroidBody(
-            ship,
+        self._turnShipTowardsFutureAsteroidBody(
             closestAsteroidBody,
             closestBodyFuturePosition
         );
 
-        asteroids._approachFutureAsteroidBody(
-            ship,
+        self._approachFutureAsteroidBody(
             closestAsteroidBody,
             closestBodyFuturePosition
         );
     };
 
-    asteroids._getClosestAsteroidBody = function (ship) {
-        var asteroidGameObjects = ship.game.getAsteroids();
+    asteroids.AIControlFunction.prototype._getClosestAsteroidBody = function () {
+        var self = this;
+
+        var asteroidGameObjects = self.ship.game.getAsteroids();
 
         var asteroidBodies = _.flatten(
             _.map(asteroidGameObjects, function (asteroid) {
@@ -83,7 +81,7 @@
         );
 
         var closestAsteroid = _.min(asteroidBodies, function (asteroidBody) {
-            return asteroids._combinedAsteroidBodyDistance(ship, asteroidBody);
+            return self._combinedAsteroidBodyDistance(asteroidBody);
         });
 
         if (closestAsteroid === Infinity) {
@@ -93,63 +91,71 @@
         return closestAsteroid;
     };
 
-    asteroids._getFuturePosition = function (ship, asteroidBody) {
+    asteroids.AIControlFunction.prototype._getFuturePosition = function (asteroidBody) {
+        var self = this;
+
         var bodyPosition = asteroidBody.getOffsetPosition();
         var asteroidVelocity = asteroidBody.parent.velocity;
 
-        var lookAheadTime = asteroids._combinedAsteroidBodyDistance(ship, asteroidBody);
+        var lookAheadTime = self._combinedAsteroidBodyDistance(asteroidBody);
         return _.clone(asteroidVelocity).scale(lookAheadTime).add(bodyPosition);
     };
 
 
-    asteroids._combinedAsteroidBodyDistance = function (ship, asteroidBody) {
+    asteroids.AIControlFunction.prototype._combinedAsteroidBodyDistance = function (asteroidBody) {
+        var self = this;
+
         var bodyPosition = asteroidBody.getOffsetPosition();
 
-        var bodyOffset = _.clone(bodyPosition).sub(ship.position);
+        var bodyOffset = _.clone(bodyPosition).sub(self.ship.position);
         var euclideanDistance = bodyOffset.len() - asteroidBody.parent.getEnclosingCircleRadius();
 
         var angularDistance = mathHelperFunctions.minAngularDifference(
-            ship.rotation,
+            self.ship.rotation,
             bodyOffset.angle()
         );
 
-        return euclideanDistance / ship.MAXIMUM_VELOCITY_MAGNITUDE +
-            angularDistance / ship.ANGULAR_VELOCITY;
+        return euclideanDistance / self.ship.MAXIMUM_VELOCITY_MAGNITUDE +
+            angularDistance / self.ship.ANGULAR_VELOCITY;
     };
 
-    asteroids._turnShipTowardsFutureAsteroidBody = function (ship, asteroidBody, futurePosition) {
+    asteroids.AIControlFunction.prototype._turnShipTowardsFutureAsteroidBody = function (asteroidBody, futurePosition) {
+        var self = this;
+
         var normalizedAsteroidRotation = mathHelperFunctions.normalizeAngle(
-            futurePosition.angleInRelationTo(ship.position)
+            futurePosition.angleInRelationTo(self.ship.position)
         );
 
-        var normalizedShipRotation = mathHelperFunctions.normalizeAngle(ship.rotation);
+        var normalizedShipRotation = mathHelperFunctions.normalizeAngle(self.ship.rotation);
 
         var minAngularDifference = mathHelperFunctions.minAngularDifference(
             normalizedAsteroidRotation,
             normalizedShipRotation
         );
 
-        if (minAngularDifference < ship.ANGULAR_VELOCITY / 2) {
+        if (minAngularDifference < self.ship.ANGULAR_VELOCITY / 2) {
             return;
         }
 
         if (normalizedAsteroidRotation > normalizedShipRotation) {
             if (normalizedAsteroidRotation - normalizedShipRotation <= Math.PI) {
-                ship.turn(1);
+                self.ship.turn(1);
             } else {
-                ship.turn(-1);
+                self.ship.turn(-1);
             }
         } else {
             if (normalizedShipRotation - normalizedAsteroidRotation <= Math.PI) {
-                ship.turn(-1);
+                self.ship.turn(-1);
             } else {
-                ship.turn(1);
+                self.ship.turn(1);
             }
         }
     };
 
-    asteroids._approachFutureAsteroidBody = function (ship, asteroidBody, futurePosition) {
-        var futureOffset = _.clone(futurePosition).sub(ship.position);
+    asteroids.AIControlFunction.prototype._approachFutureAsteroidBody = function (asteroidBody, futurePosition) {
+        var self = this;
+
+        var futureOffset = _.clone(futurePosition).sub(self.ship.position);
 
         var shipProximityFactor = 0.75;
 
@@ -163,20 +169,22 @@
             return;
         }
 
-        var breakingDistance = ship.velocity.len2() / (2 * ship.BRAKING_FORCE_MAGNITUDE);
+        var breakingDistance = self.ship.velocity.len2() / (2 * self.ship.BRAKING_FORCE_MAGNITUDE);
 
         if (breakingDistance > distanceToFutureOffset) {
             return;
         }
 
-        ship.accelerate();
+        self.ship.accelerate();
     };
 
-    asteroids._applyFireBehaviour = function (ship) {
+    asteroids.AIControlFunction.prototype._applyFireBehaviour = function () {
+        var self = this;
+
         var thereIsAnAsteroidWithinTheLineOfSight = _.any(
-            ship.game.getAsteroids(),
+            self.ship.game.getAsteroids(),
             function (gameObject) {
-                var lineOfSightRay = new SAT.Ray(ship.position, ship.getHeading());
+                var lineOfSightRay = new SAT.Ray(self.ship.position, self.ship.getHeading());
 
                 return _.any(gameObject.bodies, function (asteroidBody) {
                     return SAT.testRayCircle(lineOfSightRay, asteroidBody.getCircleCollider());
@@ -185,7 +193,7 @@
         );
 
         if (thereIsAnAsteroidWithinTheLineOfSight) {
-            ship.fire();
+            self.ship.fire();
         }
     };
 }(window.asteroids = window.asteroids || {}));
