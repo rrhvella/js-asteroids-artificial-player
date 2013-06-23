@@ -232,7 +232,7 @@
         self._debugDesiredVelocity = desiredVelocity;
         self._turnShipTowardsAngle(desiredVelocity.angle());
 
-        if (desiredVelocity.len2() > self.ship.velocity.len2()) {
+        if (desiredVelocity.len2() >= self.ship.velocity.len2() + self.ship.ACTUAL_ACCELERATION_MAGNITUDE) {
             self.ship.accelerate();
         }
     };
