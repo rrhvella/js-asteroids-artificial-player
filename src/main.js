@@ -34,7 +34,8 @@ $(document).ready(function () {
     var asteroidsGame = new asteroids.AsteroidsGame({
         width: 800,
         height: 600,
-        canvas: $("canvas#main")[0]
+        canvas: $("canvas#main")[0],
+        debugMode: true
     });
 
     asteroidsGame.run();

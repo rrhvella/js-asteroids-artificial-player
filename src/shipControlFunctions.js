@@ -35,9 +35,112 @@
 
         self.ship = args.ship;
         self.game = args.game;
+
+        self._debugCircleImage = new Image();
+        self._debugCircleImage.src = "media/Circle.png";
+
+        self._debugArrowImage = new Image();
+        self._debugArrowImage.src = "media/Arrow.png";
+
+        self._debugClosestAsteroid = null;
+        self._debugFutureAsteroidBodyPosition = null;
+        self._debugOffsetToFiringPosition = null;
     };
 
     asteroids.AIControlFunction.prototype.draw = function () {
+        var self = this;
+
+        if (self.game.debugMode && self._debugClosestAsteroid) {
+            self._drawAsteroidPositionDebugCircle();
+            self._drawFutureAsteroidPositionDebugCircle();
+            self._drawFiringOffsetDebugArrow();
+
+        }
+    };
+
+    asteroids.AIControlFunction.prototype._drawAsteroidPositionDebugCircle = function () {
+        var self = this;
+
+        if (!self._debugClosestAsteroid) {
+            return;
+        }
+
+        var drawingContext = self.game.getDrawingContext();
+
+        var targetCircleMargin = 4;
+
+        var radius =  self._debugClosestAsteroid.getEnclosingCircleRadius() + targetCircleMargin;
+        var diameter = radius * 2;
+
+        var closestAsteroidPosition = self._debugClosestAsteroid.position;
+
+        drawingContext.drawImage(
+            self._debugCircleImage,
+
+            closestAsteroidPosition.x - radius,
+            closestAsteroidPosition.y - radius,
+
+            diameter,
+            diameter
+        );
+    };
+
+    asteroids.AIControlFunction.prototype._drawFutureAsteroidPositionDebugCircle = function () {
+        var self = this;
+
+        if (!self._debugFutureAsteroidBodyPosition) {
+            return;
+        }
+
+        var drawingContext = self.game.getDrawingContext();
+
+        var targetCircleMargin = 4;
+
+        var radius =  self._debugClosestAsteroid.getEnclosingCircleRadius() + targetCircleMargin;
+        var diameter = radius * 2;
+
+        var futureAsteroidPosition = self._debugFutureAsteroidBodyPosition;
+
+        drawingContext.drawImage(
+            self._debugCircleImage,
+
+            futureAsteroidPosition.x - radius,
+            futureAsteroidPosition.y - radius,
+
+            diameter,
+            diameter
+        );
+    };
+
+    asteroids.AIControlFunction.prototype._drawFiringOffsetDebugArrow = function () {
+        var self = this;
+
+        if (!self._debugOffsetToFiringPosition) {
+            return;
+        }
+
+        var drawingContext = self.game.getDrawingContext();
+
+        var radius = self._debugOffsetToFiringPosition.len();
+        var diameter = radius * 2;
+
+        drawingContext.translate(self.ship.position.x, self.ship.position.y);
+        drawingContext.rotate(self._debugOffsetToFiringPosition.angle());
+        drawingContext.scale(diameter, diameter);
+
+        drawingContext.translate(-0.5, -0.5);
+
+        drawingContext.drawImage(
+            self._debugArrowImage,
+
+            0,
+            0,
+
+            1,
+            1
+        );
+
+        twoDContextHelperFunctions.resetTransform(drawingContext);
     };
 
     asteroids.AIControlFunction.prototype.update = function () {
@@ -53,10 +156,15 @@
         var closestAsteroidBody = self._getClosestAsteroidBody();
 
         if (closestAsteroidBody === null) {
+            self._debugClosestAsteroid = null;
+
             return;
         }
 
+        self._debugClosestAsteroid = closestAsteroidBody.parent;
         var closestBodyFuturePosition = self._getFuturePosition(closestAsteroidBody);
+
+        self._debugFutureAsteroidBodyPosition = closestBodyFuturePosition;
 
         self._turnShipTowardsFutureAsteroidBody(
             closestAsteroidBody,
@@ -162,8 +270,8 @@
         var asteroidRadius = asteroidBody.parent.getEnclosingCircleRadius();
         var alteredProjectileDistance = asteroids.Projectile.prototype.MAX_DISTANCE * shipProximityFactor;
 
-
         var distanceToFutureOffset = futureOffset.len() - alteredProjectileDistance - asteroidRadius;
+        self._debugOffsetToFiringPosition = self.ship.getHeading().scale(distanceToFutureOffset);
 
         if (distanceToFutureOffset <= 0) {
             return;

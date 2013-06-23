@@ -34,7 +34,18 @@
         var self = this;
 
         var framesPerSecond = 30;
+
         var updatesPerSecond = 20;
+        self.debugMode = false;
+
+        if (args.debugMode) {
+            if (!args.canvas) {
+                throw "Can only use debug mode in conjunction with canvas, as debug information is visual";
+            }
+
+            updatesPerSecond = 1;
+            self.debugMode = true;
+        }
 
         self.setCanvas(args.canvas);
 
