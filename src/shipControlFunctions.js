@@ -168,7 +168,12 @@
 
         self._debugFutureAsteroidBodyPosition = closestBodyFuturePosition;
 
-        return closestBodyFuturePosition.sub(self.ship.position);
+        var futureBodyOffset = closestBodyFuturePosition.sub(self.ship.position);
+        var forceMagnitude = futureBodyOffset.len() -
+            closestAsteroidBody.parent.getEnclosingCircleRadius() -
+            self.ship.getEnclosingCircleRadius();
+
+        return futureBodyOffset.normalize().scale(forceMagnitude);
     };
 
     asteroids.AIControlFunction.prototype._getClosestAsteroidBody = function () {
