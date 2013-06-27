@@ -53,7 +53,7 @@
         if (self.game.debugMode && self._debugClosestAsteroid) {
             self._drawAsteroidPositionDebugCircle();
             self._drawFutureAsteroidPositionDebugCircle();
-            self._drawFiringOffsetDebugArrow();
+            self._drawDesiredVelocityDebugArrow();
 
         }
     };
@@ -112,7 +112,7 @@
         );
     };
 
-    asteroids.AIControlFunction.prototype._drawFiringOffsetDebugArrow = function () {
+    asteroids.AIControlFunction.prototype._drawDesiredVelocityDebugArrow = function () {
         var self = this;
 
         if (!self._debugDesiredVelocity) {
