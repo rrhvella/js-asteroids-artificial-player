@@ -189,6 +189,11 @@
             image: self._debugPursuidAsteroidCircleImage
         });
 
+        if (forceMagnitude === 0) {
+            var replacementMagnitudeToMaintainDirection = 0.00000001;
+            forceMagnitude = replacementMagnitudeToMaintainDirection;
+        }
+
         return futureBodyOffset.normalize().scale(forceMagnitude);
     };
 
@@ -297,6 +302,10 @@
 
     asteroids.AIControlFunction.prototype._controlShipBasedOnDesiredVelocity = function (desiredVelocity) {
         var self = this;
+
+        if (desiredVelocity.x === 0 && desiredVelocity.y === 0) {
+            return;
+        }
 
         self._debugDesiredVelocity = desiredVelocity;
         self._turnShipTowardsAngle(desiredVelocity.angle());
