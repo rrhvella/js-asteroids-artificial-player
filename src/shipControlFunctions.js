@@ -129,7 +129,7 @@
         var self = this;
 
         self._debugAsteroidsAndFuturePositions = [];
-        var totalForce = self._getPursuitForce();
+        var totalForce = new SAT.Vector(0, 0);
 
         _.each(self.ship.game.getAsteroids(), function (asteroid) {
             var avoidanceForce = null;
@@ -144,6 +144,12 @@
                 totalForce.add(avoidanceForce);
             }
         });
+
+        var noAsteroidsToAvoid = totalForce.x === 0 && totalForce.y === 0;
+
+        if (noAsteroidsToAvoid) {
+            totalForce.add(self._getPursuitForce());
+        }
 
         self._controlShipBasedOnDesiredVelocity(totalForce);
         self._applyFireBehaviour();
