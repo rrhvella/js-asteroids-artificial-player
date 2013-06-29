@@ -34,6 +34,22 @@
     var Circle = SAT.Circle;
     var Vector = SAT.Vector;
 
+    test("Vector angle returns 0 for vector facing down", function () {
+        equal(new Vector(0, 1).angle(), 0);
+    });
+
+    test("Vector angle returns 0 for 0 vector", function () {
+        equal(new Vector(0, 0).angle(), 0);
+    });
+
+    test("Vector angle returns pi for vector facing up", function () {
+        equal(new Vector(0, -1).angle(), Math.PI);
+    });
+
+    test("Vector angle returns is not affected by magnitude", function () {
+        equal(new Vector(0, -200).angle(), Math.PI);
+    });
+
     test("testRayCircle returns false for ray with no direction.", function () {
         var ray = new Ray(new Vector(0, 0), new Vector(0, 0));
         var circle = new Circle(new Vector(0, 0), 10);

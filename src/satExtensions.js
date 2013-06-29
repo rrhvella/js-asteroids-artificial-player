@@ -49,7 +49,7 @@
     SAT.Vector.prototype.angle = function () {
         var self = this;
 
-        return Math.atan2(-self.x, self.y);
+        return mathHelperFunctions.normalizeAngle(Math.atan2(-self.x, self.y));
     };
 
     SAT.Vector.prototype.angleInRelationTo = function (other) {
