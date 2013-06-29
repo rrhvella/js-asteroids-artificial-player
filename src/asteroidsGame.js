@@ -43,7 +43,7 @@
                 throw "Can only use debug mode in conjunction with canvas, as debug information is visual";
             }
 
-            updatesPerSecond = 1;
+            updatesPerSecond = 5;
             self.debugMode = true;
         }
 
