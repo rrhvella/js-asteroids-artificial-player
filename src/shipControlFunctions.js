@@ -36,80 +36,62 @@
         self.ship = args.ship;
         self.game = args.game;
 
-        self._debugCircleImage = new Image();
-        self._debugCircleImage.src = "media/Circle.png";
+        self._debugPursuidAsteroidCircleImage = new Image();
+        self._debugPursuidAsteroidCircleImage.src = "media/redCircle.png";
+
+        self._debugAvoidedAsteroidCircleImage = new Image();
+        self._debugAvoidedAsteroidCircleImage.src = "media/blueCircle.png";
 
         self._debugArrowImage = new Image();
-        self._debugArrowImage.src = "media/Arrow.png";
+        self._debugArrowImage.src = "media/redArrow.png";
 
-        self._debugClosestAsteroid = null;
-        self._debugFutureAsteroidBodyPosition = null;
+        self._debugAsteroidsAndFuturePositions = null;
         self._debugDesiredVelocity = null;
     };
 
     asteroids.AIControlFunction.prototype.draw = function () {
         var self = this;
 
-        if (self.game.debugMode && self._debugClosestAsteroid) {
-            self._drawAsteroidPositionDebugCircle();
-            self._drawFutureAsteroidPositionDebugCircle();
+        if (self.game.debugMode) {
+            self._drawAsteroidCurrentAndFuturePositionsDebugCircles();
             self._drawDesiredVelocityDebugArrow();
-
         }
     };
 
-    asteroids.AIControlFunction.prototype._drawAsteroidPositionDebugCircle = function () {
+    asteroids.AIControlFunction.prototype._drawAsteroidCurrentAndFuturePositionsDebugCircles = function () {
         var self = this;
 
-        if (!self._debugClosestAsteroid) {
-            return;
-        }
-
         var drawingContext = self.game.getDrawingContext();
-
         var targetCircleMargin = 4;
 
-        var radius = self._debugClosestAsteroid.getEnclosingCircleRadius() + targetCircleMargin;
-        var diameter = radius * 2;
+        _.each(self._debugAsteroidsAndFuturePositions, function (asteroidAndFuturePosition) {
+            var asteroid = asteroidAndFuturePosition.asteroid;
+            var futureBodyPosition = asteroidAndFuturePosition.futureBodyPosition;
+            var image = asteroidAndFuturePosition.image;
 
-        var closestAsteroidPosition = self._debugClosestAsteroid.position;
+            var radius = asteroid.getEnclosingCircleRadius() + targetCircleMargin;
+            var diameter = radius * 2;
 
-        drawingContext.drawImage(
-            self._debugCircleImage,
+            drawingContext.drawImage(
+                image,
 
-            closestAsteroidPosition.x - radius,
-            closestAsteroidPosition.y - radius,
+                asteroid.position.x - radius,
+                asteroid.position.y - radius,
 
-            diameter,
-            diameter
-        );
-    };
+                diameter,
+                diameter
+            );
 
-    asteroids.AIControlFunction.prototype._drawFutureAsteroidPositionDebugCircle = function () {
-        var self = this;
+            drawingContext.drawImage(
+                image,
 
-        if (!self._debugFutureAsteroidBodyPosition) {
-            return;
-        }
+                futureBodyPosition.x - radius,
+                futureBodyPosition.y - radius,
 
-        var drawingContext = self.game.getDrawingContext();
-
-        var targetCircleMargin = 4;
-
-        var radius = self._debugClosestAsteroid.getEnclosingCircleRadius() + targetCircleMargin;
-        var diameter = radius * 2;
-
-        var futureAsteroidPosition = self._debugFutureAsteroidBodyPosition;
-
-        drawingContext.drawImage(
-            self._debugCircleImage,
-
-            futureAsteroidPosition.x - radius,
-            futureAsteroidPosition.y - radius,
-
-            diameter,
-            diameter
-        );
+                diameter,
+                diameter
+            );
+        });
     };
 
     asteroids.AIControlFunction.prototype._drawDesiredVelocityDebugArrow = function () {
@@ -146,6 +128,7 @@
     asteroids.AIControlFunction.prototype.update = function () {
         var self = this;
 
+        self._debugAsteroidsAndFuturePositions = [];
         var totalForce = self._getPursuitForce();
 
         _.each(self.ship.game.getAsteroids(), function (asteroid) {
@@ -172,19 +155,13 @@
         var closestAsteroidBody = self._getClosestAsteroidBody();
 
         if (closestAsteroidBody === null) {
-            self._debugClosestAsteroid = null;
-
             return new SAT.Vector(0, 0);
         }
 
         var shipVelocityMagnitude = self.ship.velocity.len();
 
-        self._debugClosestAsteroid = closestAsteroidBody.parent;
         var futurePositions = self._getFuturePositions(closestAsteroidBody);
-
         var closestBodyFuturePosition = futurePositions.asteroidBodyFuturePosition;
-
-        self._debugFutureAsteroidBodyPosition = closestBodyFuturePosition;
 
         var futureBodyOffset = _.clone(closestBodyFuturePosition).sub(self.ship.position);
         var shipProximityFactor = 0.75;
@@ -199,6 +176,12 @@
         if (shipVelocityMagnitude > forceMagnitude) {
             forceMagnitude = shipVelocityMagnitude;
         }
+
+        self._debugAsteroidsAndFuturePositions.push({
+            asteroid: closestAsteroidBody.parent,
+            futureBodyPosition: closestBodyFuturePosition,
+            image: self._debugPursuidAsteroidCircleImage
+        });
 
         return futureBodyOffset.normalize().scale(forceMagnitude);
     };
@@ -227,6 +210,12 @@
 
         var futureOffset = _.clone(self.ship.position).sub(asteroidBodyFuturePosition);
         var futureOffsetMagnitude = self.ship.MAXIMUM_VELOCITY_MAGNITUDE;
+
+        self._debugAsteroidsAndFuturePositions.push({
+            asteroid: asteroidBody.parent,
+            futureBodyPosition: asteroidBodyFuturePosition,
+            image: self._debugAvoidedAsteroidCircleImage
+        });
 
         return futureOffset.normalize().scale(futureOffsetMagnitude);
     };
