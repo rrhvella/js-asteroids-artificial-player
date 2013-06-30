@@ -42,6 +42,9 @@
         self._debugAvoidedAsteroidCircleImage = new Image();
         self._debugAvoidedAsteroidCircleImage.src = "media/blueCircle.png";
 
+        self._debugRemainingAsteroidCircleImage = new Image();
+        self._debugRemainingAsteroidCircleImage.src = "media/greenCircle.png";
+
         self._debugArrowImage = new Image();
         self._debugArrowImage.src = "media/redArrow.png";
 
@@ -216,6 +219,12 @@
         );
 
         if (!SAT.testCircleCircle(asteroidBodyFutureCircleCollider, shipFutureCircleCollider)) {
+            self._debugAsteroidsAndFuturePositions.push({
+                asteroid: asteroidBody.parent,
+                futureBodyPosition: asteroidBodyFuturePosition,
+                image: self._debugRemainingAsteroidCircleImage
+            });
+
             return null;
         }
 
@@ -289,7 +298,8 @@
         var bodyPosition = asteroidBody.getOffsetPosition();
 
         var bodyOffset = _.clone(bodyPosition).sub(self.ship.position);
-        var euclideanDistance = bodyOffset.len() - asteroidBody.parent.getEnclosingCircleRadius();
+        var euclideanDistance = bodyOffset.len() - asteroidBody.parent.getEnclosingCircleRadius() -
+            self.ship.getEnclosingCircleRadius();
 
         var angularDistance = mathHelperFunctions.minAngularDifference(
             self.ship.rotation,
