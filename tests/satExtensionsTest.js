@@ -33,6 +33,70 @@
     var Ray = SAT.Ray;
     var Circle = SAT.Circle;
     var Vector = SAT.Vector;
+    var RotatableBox = SAT.RotatableBox;
+
+    var polygonContainsAllPoints = function (polygon, points) {
+        var maximumError = 0.0001;
+        _.each(
+            points,
+            function (queryVector) {
+                ok(
+                    _.any(
+                        polygon.points,
+                        function (recordVector) {
+                            return recordVector.x - queryVector.x < maximumError &&
+                                recordVector.y - queryVector.y < maximumError;
+                        }
+                    )
+                );
+            }
+        );
+    };
+
+    test("Rotatable box returns regular box polygon at 0 rotation.", function () {
+        var rotateableBox = new RotatableBox(new Vector(0, 0), 0, 2, 1);
+        var polygon = rotateableBox.toPolygon();
+
+        polygonContainsAllPoints(
+            polygon,
+            [
+                new Vector(-1, -0.5),
+                new Vector(-1, 0.5),
+                new Vector(1, -0.5),
+                new Vector(1, 0.5)
+            ]
+        );
+    });
+
+    test("Rotatable box returns perpendicular box polygon at Pi/2 rotation.", function () {
+        var rotateableBox = new RotatableBox(new Vector(0, 0), Math.PI / 2, 2, 1);
+        var polygon = rotateableBox.toPolygon();
+
+        polygonContainsAllPoints(
+            polygon,
+            [
+                new Vector(-0.5, -1),
+                new Vector(-0.5, 1),
+                new Vector(0.5, -1),
+                new Vector(0.5, 1)
+            ]
+        );
+    });
+
+    test("Rotatable box returns diagonal box polygon at Pi/4 rotation.", function () {
+        var rotateableBox = new RotatableBox(new Vector(0, 0), Math.PI / 4, 2, 1);
+        var polygon = rotateableBox.toPolygon();
+
+        polygonContainsAllPoints(
+            polygon,
+            [
+                new Vector(0.3536, 1.0607),
+                new Vector(1.0607, 0.3536),
+                new Vector(-0.3536, -1.0607),
+                new Vector(-1.0607, -0.3536)
+            ]
+        );
+    });
 
     test("Vector angle returns 0 for vector facing down", function () {
         equal(new Vector(0, 1).angle(), 0);

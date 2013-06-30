@@ -39,15 +39,13 @@
         self._debugPursuidAsteroidCircleImage = new Image();
         self._debugPursuidAsteroidCircleImage.src = "media/redCircle.png";
 
-        self._debugAvoidedAsteroidCircleImage = new Image();
-        self._debugAvoidedAsteroidCircleImage.src = "media/blueCircle.png";
-
-        self._debugRemainingAsteroidCircleImage = new Image();
-        self._debugRemainingAsteroidCircleImage.src = "media/greenCircle.png";
+        self._debugAsteroidProjectionBoxImage = new Image();
+        self._debugAsteroidProjectionBoxImage.src = "media/blueBox.png";
 
         self._debugArrowImage = new Image();
         self._debugArrowImage.src = "media/redArrow.png";
 
+        self._debugAsteroidProjectionBoxes = null;
         self._debugAsteroidsAndFuturePositions = null;
         self._debugDesiredVelocity = null;
     };
@@ -57,6 +55,7 @@
 
         if (self.game.debugMode) {
             self._drawAsteroidCurrentAndFuturePositionsDebugCircles();
+            self._drawAsteroidProjectionBoxes();
             self._drawDesiredVelocityDebugArrow();
         }
     };
@@ -97,6 +96,35 @@
         });
     };
 
+    asteroids.AIControlFunction.prototype._drawAsteroidProjectionBoxes = function () {
+        var self = this;
+
+        var drawingContext = self.game.getDrawingContext();
+
+        _.each(
+            self._debugAsteroidProjectionBoxes,
+            function (projectionBox) {
+                drawingContext.translate(projectionBox.centerPosition.x, projectionBox.centerPosition.y);
+                drawingContext.rotate(projectionBox.rotation);
+                drawingContext.scale(projectionBox.width, projectionBox.height);
+
+                drawingContext.translate(-0.5, -0.5);
+
+                drawingContext.drawImage(
+                    self._debugAsteroidProjectionBoxImage,
+
+                    0,
+                    0,
+
+                    1,
+                    1
+                );
+
+                twoDContextHelperFunctions.resetTransform(drawingContext);
+            }
+        );
+    };
+
     asteroids.AIControlFunction.prototype._drawDesiredVelocityDebugArrow = function () {
         var self = this;
 
@@ -132,6 +160,8 @@
         var self = this;
 
         self._debugAsteroidsAndFuturePositions = [];
+        self._debugAsteroidProjectionBoxes = [];
+
         var totalForce = new SAT.Vector(0, 0);
 
         _.each(self.ship.game.getAsteroids(), function (asteroid) {
@@ -208,34 +238,35 @@
         var asteroidBodyFuturePosition = futurePositions.asteroidBodyFuturePosition;
         var shipFuturePosition = futurePositions.shipFuturePosition;
 
-        var asteroidBodyFutureCircleCollider = new SAT.Circle(
-            asteroidBodyFuturePosition,
-            asteroidBody.parent.getEnclosingCircleRadius()
+        var bodyPosition = asteroidBody.getOffsetPosition();
+
+        var asteroidMovementProjectionBox = new SAT.RotatableBox(
+            _.clone(asteroidBodyFuturePosition).sub(bodyPosition).scale(0.5).add(bodyPosition),
+            asteroidBodyFuturePosition.angleInRelationTo(bodyPosition),
+            asteroidBody.parent.scale,
+            asteroidBodyFuturePosition.distanceTo(bodyPosition)
         );
 
-        var shipFutureCircleCollider = new SAT.Circle(
-            shipFuturePosition,
-            self.ship.getEnclosingCircleRadius()
+        var shipMovementProjectionBox = new SAT.RotatableBox(
+            _.clone(shipFuturePosition).sub(self.ship.position).scale(0.5).add(self.ship.position),
+            shipFuturePosition.angleInRelationTo(self.ship.position),
+            self.ship.scale,
+            shipFuturePosition.distanceTo(self.ship.position)
         );
 
-        if (!SAT.testCircleCircle(asteroidBodyFutureCircleCollider, shipFutureCircleCollider)) {
-            self._debugAsteroidsAndFuturePositions.push({
-                asteroid: asteroidBody.parent,
-                futureBodyPosition: asteroidBodyFuturePosition,
-                image: self._debugRemainingAsteroidCircleImage
-            });
+        self._debugAsteroidProjectionBoxes.push(asteroidMovementProjectionBox);
 
+        var projectionBoxesOverlap = SAT.testPolygonPolygon(
+            asteroidMovementProjectionBox.toPolygon(),
+            shipMovementProjectionBox.toPolygon()
+        );
+
+        if (!projectionBoxesOverlap) {
             return null;
         }
 
         var futureOffset = _.clone(self.ship.position).sub(asteroidBodyFuturePosition);
         var futureOffsetMagnitude = self.ship.MAXIMUM_VELOCITY_MAGNITUDE;
-
-        self._debugAsteroidsAndFuturePositions.push({
-            asteroid: asteroidBody.parent,
-            futureBodyPosition: asteroidBodyFuturePosition,
-            image: self._debugAvoidedAsteroidCircleImage
-        });
 
         return futureOffset.normalize().scale(futureOffsetMagnitude);
     };

@@ -52,6 +52,12 @@
         return mathHelperFunctions.normalizeAngle(Math.atan2(-self.x, self.y));
     };
 
+    SAT.Vector.prototype.distanceTo = function (other) {
+        var self = this;
+
+        return _.clone(self).sub(other).len();
+    };
+
     SAT.Vector.prototype.angleInRelationTo = function (other) {
         var self = this;
 
@@ -68,6 +74,39 @@
         } else {
             self.direction = new SAT.Vector();
         }
+    };
+
+    SAT.RotatableBox = function (centerPosition, rotation, width, height) {
+        var self = this;
+
+        self.centerPosition = centerPosition;
+        self.rotation = rotation;
+
+        self.width = width;
+        self.height = height;
+    };
+
+    SAT.RotatableBox.prototype.toPolygon = function () {
+        var self = this;
+
+        var xAxisOrientation = mathHelperFunctions.normalizeAngle(self.rotation + Math.PI / 2);
+        var yAxisOrientation = self.rotation;
+
+        var xAxis = SAT.angleToNormal(xAxisOrientation);
+        var yAxis = SAT.angleToNormal(yAxisOrientation);
+
+        var halfWidth = self.width / 2;
+        var halfHeight = self.height / 2;
+
+        return new SAT.Polygon(
+            _.clone(self.centerPosition),
+            [
+                _.clone(xAxis).scale(-halfWidth).add(_.clone(yAxis).scale(-halfHeight)),
+                _.clone(xAxis).scale(-halfWidth).add(_.clone(yAxis).scale(halfHeight)),
+                _.clone(xAxis).scale(halfWidth).add(_.clone(yAxis).scale(-halfHeight)),
+                _.clone(xAxis).scale(halfWidth).add(_.clone(yAxis).scale(halfHeight))
+            ]
+        );
     };
 
     SAT.testRayCircle = function (ray, circle) {
