@@ -265,10 +265,10 @@
             return null;
         }
 
-        var futureOffset = _.clone(self.ship.position).sub(asteroidBodyFuturePosition);
-        var futureOffsetMagnitude = self.ship.MAXIMUM_VELOCITY_MAGNITUDE;
+        var force = _.clone(self.ship.position).sub(asteroidBody.getOffsetPosition());
+        var forceMagnitude = self.ship.MAXIMUM_VELOCITY_MAGNITUDE;
 
-        return futureOffset.normalize().scale(futureOffsetMagnitude);
+        return force.normalize().scale(forceMagnitude);
     };
 
     asteroids.AIControlFunction.prototype._getClosestAsteroidBody = function () {
