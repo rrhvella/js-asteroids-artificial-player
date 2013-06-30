@@ -75,16 +75,18 @@
         var viewWidth = self.game.getWidth();
         var viewHeight = self.game.getHeight();
 
-        if (x - self.scale > viewWidth) {
-            x = 0;
-        } else if (x + self.scale <= 0) {
-            x = viewWidth - x - self.scale;
+        var radius = self.getEnclosingCircleRadius();
+
+        if (x - radius > viewWidth) {
+            x = x - viewWidth;
+        } else if (x + radius <= 0) {
+            x = x + viewWidth;
         }
 
-        if (y - self.scale > viewHeight) {
-            y = 0;
-        } else if (y + self.scale <= 0) {
-            y = viewHeight - y - self.scale;
+        if (y - radius > viewHeight) {
+            y = y - viewHeight;
+        } else if (y + radius <= 0) {
+            y = y + viewHeight;
         }
 
         self.position.x = x;
