@@ -250,14 +250,13 @@
 
         var velocity = args.direction.scale(self.VELOCITY_MAGNITUDE);
 
-        _.extend(args, {
+        asteroids.AsteroidsGameObject.call(self, {
+            game: args.game,
             scale: 5,
             velocity: velocity,
             position: args.position.add(velocity),
             imageSrc: "media/asteroid.png"
         });
-
-        asteroids.AsteroidsGameObject.call(self, args);
 
         self.timeToDeath = self.NUMBER_OF_FRAMES_TO_DEATH;
     };
