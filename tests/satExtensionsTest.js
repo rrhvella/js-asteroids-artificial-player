@@ -35,35 +35,27 @@
     var Vector = SAT.Vector;
     var RotatableBox = SAT.RotatableBox;
 
-    var polygonContainsAllPoints = function (polygon, points) {
+    var polygonContainsPoints = function (polygon, points) {
         var maximumError = 0.0001;
-        _.each(
-            points,
-            function (queryVector) {
-                ok(
-                    _.any(
-                        polygon.points,
-                        function (recordVector) {
-                            return recordVector.x - queryVector.x < maximumError &&
-                                recordVector.y - queryVector.y < maximumError;
-                        }
-                    )
-                );
-            }
-        );
+        var i = 0;
+
+        for (i = 0; i < polygon.points.length; i += 1) {
+            ok(polygon.points[i].x - points[i].x <= maximumError);
+            ok(polygon.points[i].y - points[i].y <= maximumError);
+        }
     };
 
     test("Rotatable box returns regular box polygon at 0 rotation.", function () {
         var rotateableBox = new RotatableBox(new Vector(0, 0), 0, 2, 1);
         var polygon = rotateableBox.toPolygon();
 
-        polygonContainsAllPoints(
+        polygonContainsPoints(
             polygon,
             [
                 new Vector(-1, -0.5),
                 new Vector(-1, 0.5),
-                new Vector(1, -0.5),
-                new Vector(1, 0.5)
+                new Vector(1, 0.5),
+                new Vector(1, -0.5)
             ]
         );
     });
@@ -72,12 +64,12 @@
         var rotateableBox = new RotatableBox(new Vector(0, 0), Math.PI / 2, 2, 1);
         var polygon = rotateableBox.toPolygon();
 
-        polygonContainsAllPoints(
+        polygonContainsPoints(
             polygon,
             [
+                new Vector(0.5, -1),
                 new Vector(-0.5, -1),
                 new Vector(-0.5, 1),
-                new Vector(0.5, -1),
                 new Vector(0.5, 1)
             ]
         );
@@ -87,13 +79,13 @@
         var rotateableBox = new RotatableBox(new Vector(0, 0), Math.PI / 4, 2, 1);
         var polygon = rotateableBox.toPolygon();
 
-        polygonContainsAllPoints(
+        polygonContainsPoints(
             polygon,
             [
-                new Vector(0.3536, 1.0607),
-                new Vector(1.0607, 0.3536),
                 new Vector(-0.3536, -1.0607),
-                new Vector(-1.0607, -0.3536)
+                new Vector(-1.0607, -0.3536),
+                new Vector(0.3536, 1.0607),
+                new Vector(1.0607, 0.3536)
             ]
         );
     });

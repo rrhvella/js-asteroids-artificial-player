@@ -95,7 +95,7 @@
     SAT.RotatableBox.prototype.toPolygon = function () {
         var self = this;
 
-        var xAxisOrientation = mathHelperFunctions.normalizeAngle(self.rotation + Math.PI / 2);
+        var xAxisOrientation = mathHelperFunctions.normalizeAngle(self.rotation - Math.PI / 2);
         var yAxisOrientation = self.rotation;
 
         var xAxis = SAT.angleToNormal(xAxisOrientation);
@@ -109,8 +109,8 @@
             [
                 xAxis.clone().scale(-halfWidth).add(yAxis.clone().scale(-halfHeight)),
                 xAxis.clone().scale(-halfWidth).add(yAxis.clone().scale(halfHeight)),
-                xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(-halfHeight)),
-                xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(halfHeight))
+                xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(halfHeight)),
+                xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(-halfHeight))
             ]
         );
     };
