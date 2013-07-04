@@ -55,22 +55,28 @@
     SAT.Vector.prototype.distanceTo = function (other) {
         var self = this;
 
-        return _.clone(self).sub(other).len();
+        return self.clone().sub(other).len();
     };
 
     SAT.Vector.prototype.angleInRelationTo = function (other) {
         var self = this;
 
-        return _.clone(self).sub(other).angle();
+        return self.clone().sub(other).angle();
+    };
+
+    SAT.Vector.prototype.clone = function () {
+        var self = this;
+
+        return new SAT.Vector(self.x, self.y);
     };
 
     SAT.Ray = function (origin, direction) {
         var self = this;
 
-        self.origin = _.clone(origin) || new SAT.Vector();
+        self.origin = origin ? origin.clone() : new SAT.Vector();
 
         if (direction) {
-            self.direction = _.clone(direction).normalize();
+            self.direction = direction.clone().normalize();
         } else {
             self.direction = new SAT.Vector();
         }
@@ -99,12 +105,12 @@
         var halfHeight = self.height / 2;
 
         return new SAT.Polygon(
-            _.clone(self.centerPosition),
+            self.centerPosition.clone(),
             [
-                _.clone(xAxis).scale(-halfWidth).add(_.clone(yAxis).scale(-halfHeight)),
-                _.clone(xAxis).scale(-halfWidth).add(_.clone(yAxis).scale(halfHeight)),
-                _.clone(xAxis).scale(halfWidth).add(_.clone(yAxis).scale(-halfHeight)),
-                _.clone(xAxis).scale(halfWidth).add(_.clone(yAxis).scale(halfHeight))
+                xAxis.clone().scale(-halfWidth).add(yAxis.clone().scale(-halfHeight)),
+                xAxis.clone().scale(-halfWidth).add(yAxis.clone().scale(halfHeight)),
+                xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(-halfHeight)),
+                xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(halfHeight))
             ]
         );
     };

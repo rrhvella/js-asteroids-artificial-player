@@ -36,7 +36,7 @@
 
         self.game = args.game;
 
-        self.position = objectHelpers.cloneOrDefault(args.position, new SAT.Vector(0, 0));
+        self.position = args.position ? args.position.clone() : new SAT.Vector(0, 0);
 
         self.rotation = args.rotation || 0;
 
@@ -45,7 +45,7 @@
         self.image = new Image();
         self.image.src = args.imageSrc;
 
-        self.velocity = objectHelpers.cloneOrDefault(args.velocity, new SAT.Vector(0, 0));
+        self.velocity = args.velocity ? args.velocity.clone() : new SAT.Vector(0, 0);
 
         self.bodies = [ new asteroids.AsteroidsGameObjectBody({ parent: self }) ];
     };
@@ -114,10 +114,7 @@
         var self = this;
 
         self.parent = args.parent;
-        self.offsetFromParent = objectHelpers.cloneOrDefault(
-            args.offsetFromParent,
-            new SAT.Vector(0, 0)
-        );
+        self.offsetFromParent = args.offsetFromParent ? args.offsetFromParent.clone() : new SAT.Vector(0, 0);
     };
 
     asteroids.AsteroidsGameObjectBody.prototype.getCircleCollider = function () {
@@ -129,7 +126,7 @@
     asteroids.AsteroidsGameObjectBody.prototype.getOffsetPosition = function () {
         var self = this;
 
-        return _.clone(self.parent.position).add(self.offsetFromParent)
+        return self.parent.position.clone().add(self.offsetFromParent);
     };
 
     asteroids.Ship = function (args) {
@@ -237,7 +234,7 @@
             new asteroids.Projectile({
                 game: self.game,
 
-                position: (new SAT.Vector()).copy(self.position),
+                position: self.position.clone(),
                 direction: self.getHeading()
             })
         );

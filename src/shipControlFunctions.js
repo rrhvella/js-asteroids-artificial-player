@@ -202,7 +202,7 @@
         var futurePositions = self._getFuturePositions(closestAsteroidBody);
         var closestBodyFuturePosition = futurePositions.asteroidBodyFuturePosition;
 
-        var futureBodyOffset = _.clone(closestBodyFuturePosition).sub(self.ship.position);
+        var futureBodyOffset = closestBodyFuturePosition.clone().sub(self.ship.position);
         var shipProximityFactor = 0.75;
 
         var asteroidRadius = closestAsteroidBody.parent.getEnclosingCircleRadius();
@@ -241,14 +241,14 @@
         var bodyPosition = asteroidBody.getOffsetPosition();
 
         var asteroidMovementProjectionBox = new SAT.RotatableBox(
-            _.clone(asteroidBodyFuturePosition).sub(bodyPosition).scale(0.5).add(bodyPosition),
+            asteroidBodyFuturePosition.clone().sub(bodyPosition).scale(0.5).add(bodyPosition),
             asteroidBodyFuturePosition.angleInRelationTo(bodyPosition),
             asteroidBody.parent.scale,
             asteroidBodyFuturePosition.distanceTo(bodyPosition)
         );
 
         var shipMovementProjectionBox = new SAT.RotatableBox(
-            _.clone(shipFuturePosition).sub(self.ship.position).scale(0.5).add(self.ship.position),
+            shipFuturePosition.clone().sub(self.ship.position).scale(0.5).add(self.ship.position),
             shipFuturePosition.angleInRelationTo(self.ship.position),
             self.ship.scale,
             shipFuturePosition.distanceTo(self.ship.position)
@@ -265,7 +265,7 @@
             return null;
         }
 
-        var force = _.clone(self.ship.position).sub(asteroidBody.getOffsetPosition());
+        var force = self.ship.position.clone().sub(asteroidBody.getOffsetPosition());
         var forceMagnitude = self.ship.MAXIMUM_VELOCITY_MAGNITUDE;
 
         return force.normalize().scale(forceMagnitude);
@@ -301,7 +301,7 @@
 
         var lookAheadTime = self._combinedAsteroidBodyDistance(asteroidBody);
 
-        var asteroidFuturePosition = _.clone(asteroidVelocity).scale(lookAheadTime).add(bodyPosition);
+        var asteroidFuturePosition = asteroidVelocity.clone().scale(lookAheadTime).add(bodyPosition);
 
         var timeToBrake = -self.ship.velocity.len() / -self.ship.BRAKING_FORCE_MAGNITUDE;
         var shipLookAheadTime = lookAheadTime;
@@ -328,7 +328,7 @@
 
         var bodyPosition = asteroidBody.getOffsetPosition();
 
-        var bodyOffset = _.clone(bodyPosition).sub(self.ship.position);
+        var bodyOffset = bodyPosition.clone().sub(self.ship.position);
         var euclideanDistance = bodyOffset.len() - asteroidBody.parent.getEnclosingCircleRadius() -
             self.ship.getEnclosingCircleRadius();
 
