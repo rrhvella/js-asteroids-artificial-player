@@ -30,6 +30,34 @@
 (function (asteroids) {
     "use strict";
 
+    asteroids.HumanInputControlFunction = function (args) {
+        var self = this;
+
+        self.game = args.game;
+        self.ship = args.ship;
+    };
+
+    asteroids.HumanInputControlFunction.prototype.draw = function () {
+    };
+
+    asteroids.HumanInputControlFunction.prototype.update = function () {
+        var self = this;
+
+        if (self.game.isKeyDown(asteroids.KeyCodes.UP)) {
+            self.ship.accelerate();
+        }
+
+        if (self.game.isKeyDown(asteroids.KeyCodes.RIGHT)) {
+            self.ship.turn(1);
+        } else if (self.game.isKeyDown(asteroids.KeyCodes.LEFT)) {
+            self.ship.turn(-1);
+        }
+
+        if (self.game.isKeyDown(asteroids.KeyCodes.SPACE)) {
+            self.ship.fire();
+        }
+    };
+
     asteroids.AIControlFunction = function (args) {
         var self = this;
 
