@@ -31,7 +31,7 @@
 $(document).ready(function () {
     "use strict";
 
-    var numberOfGames = 40;
+    var numberOfGames = 200;
     var asteroidsGame = new asteroids.AsteroidsGame({ width: 800, height: 600 });
 
     var gamesWon = 0;

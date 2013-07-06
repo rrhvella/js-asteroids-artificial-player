@@ -269,7 +269,7 @@
         ];
 
         self._gameWon = null;
-        self._updatesLeftTillTimeDefeat = 100000;
+        self._updatesLeftTillTimeDefeat = 10000;
     };
 
     asteroids.AsteroidsGame.prototype.detectCollisions = function () {
