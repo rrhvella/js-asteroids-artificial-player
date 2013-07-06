@@ -199,8 +199,7 @@
 
         var shipVelocityMagnitude = self.ship.velocity.len();
 
-        var futurePositions = self._getFuturePositions(closestAsteroidBody);
-        var closestBodyFuturePosition = futurePositions.asteroidBodyFuturePosition;
+        var closestBodyFuturePosition = self._getFutureAsteroidPositionForPursuit(closestAsteroidBody);
 
         var futureBodyOffset = closestBodyFuturePosition.clone().sub(self.ship.position);
         var shipProximityFactor = 0.75;
@@ -233,7 +232,7 @@
     asteroids.AIControlFunction.prototype._getAvoidanceForce = function (asteroidBody) {
         var self = this;
 
-        var futurePositions = self._getFuturePositions(asteroidBody);
+        var futurePositions = self._getFuturePositionsForAvoidance(asteroidBody);
 
         var asteroidBodyFuturePosition = futurePositions.asteroidBodyFuturePosition;
         var shipFuturePosition = futurePositions.shipFuturePosition;
@@ -293,25 +292,21 @@
         return closestAsteroid;
     };
 
-    asteroids.AIControlFunction.prototype._getFuturePositions = function (asteroidBody) {
+    asteroids.AIControlFunction.prototype._getFuturePositionsForAvoidance = function (asteroidBody) {
         var self = this;
 
         var bodyPosition = asteroidBody.getOffsetPosition();
         var asteroidVelocity = asteroidBody.parent.velocity;
 
-        var lookAheadTime = self._combinedAsteroidBodyDistance(asteroidBody);
+        var timeToBrake = self.ship.velocity.len() / self.ship.BRAKING_FORCE_MAGNITUDE;
+        var timeToTurnAround = Math.PI / self.ship.ANGULAR_VELOCITY;
+
+        var lookAheadTime = timeToBrake + timeToTurnAround + 1;
 
         var asteroidFuturePosition = asteroidVelocity.clone().scale(lookAheadTime).add(bodyPosition);
 
-        var timeToBrake = -self.ship.velocity.len() / -self.ship.BRAKING_FORCE_MAGNITUDE;
-        var shipLookAheadTime = lookAheadTime;
-
-        if (shipLookAheadTime > timeToBrake) {
-            shipLookAheadTime = timeToBrake;
-        }
-
-        var distanceCoveredByShip = self.ship.velocity.len() * shipLookAheadTime +
-            -self.ship.BRAKING_FORCE_MAGNITUDE * shipLookAheadTime * shipLookAheadTime * 0.5;
+        var distanceCoveredByShip = self.ship.velocity.len() * timeToBrake +
+            -self.ship.BRAKING_FORCE_MAGNITUDE * timeToBrake * timeToBrake * 0.5;
 
         var shipFuturePosition = self.ship.getHeading().scale(distanceCoveredByShip)
             .add(self.ship.position);
@@ -320,6 +315,17 @@
             asteroidBodyFuturePosition: asteroidFuturePosition,
             shipFuturePosition: shipFuturePosition
         };
+    };
+
+    asteroids.AIControlFunction.prototype._getFutureAsteroidPositionForPursuit = function (asteroidBody) {
+        var self = this;
+
+        var bodyPosition = asteroidBody.getOffsetPosition();
+        var asteroidVelocity = asteroidBody.parent.velocity;
+
+        var lookAheadTime = self._combinedAsteroidBodyDistance(asteroidBody);
+
+        return asteroidVelocity.clone().scale(lookAheadTime).add(bodyPosition);
     };
 
 
