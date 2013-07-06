@@ -72,6 +72,8 @@
             asteroids.Asteroid.prototype.OBJECT_TYPE,
             asteroids.Asteroid.prototype.OBJECT_TYPE
         );
+
+        self.onGameOver = args.onGameOver;
     };
 
     asteroids.AsteroidsGame.prototype.setCanvas = function (canvas) {
@@ -328,5 +330,9 @@
         var self = this;
 
         self._gameWon = args.won || false;
+
+        if(self.onGameOver) {
+            self.onGameOver(self);
+        }
     };
 }(window.asteroids = window.asteroids || {}));

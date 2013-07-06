@@ -35,6 +35,7 @@ $(document).ready(function () {
         width: 800,
         height: 600,
         canvas: $("canvas#main")[0],
+        onGameOver: function (game) { game.restart(); },
         debugMode: true
     });
 
