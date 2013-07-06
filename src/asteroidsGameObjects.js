@@ -281,7 +281,12 @@
 
     asteroids.Asteroid = function (args) {
         var self = this;
-        var asteroidVelocityMagnitude = 10;
+
+        var maxAsteroidVelocityMagnitude = 10;
+        var minAsteroidVelocityMagnitude = 2;
+
+        var velocityRange = (maxAsteroidVelocityMagnitude - minAsteroidVelocityMagnitude);
+        var asteroidVelocityMagnitude = minAsteroidVelocityMagnitude + Math.random() * velocityRange;
 
         asteroids.AsteroidsGameObject.call(
             self,
