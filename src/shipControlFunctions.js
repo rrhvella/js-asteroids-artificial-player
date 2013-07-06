@@ -185,7 +185,7 @@
         }
 
         self._controlShipBasedOnDesiredVelocity(totalForce);
-        self._applyFireBehaviour();
+        self.ship.fire();
     };
 
     asteroids.AIControlFunction.prototype._getPursuitForce = function () {
@@ -393,22 +393,4 @@
         }
     };
 
-    asteroids.AIControlFunction.prototype._applyFireBehaviour = function () {
-        var self = this;
-
-        var thereIsAnAsteroidWithinTheLineOfSight = _.any(
-            self.ship.game.getAsteroids(),
-            function (gameObject) {
-                var lineOfSightRay = new SAT.Ray(self.ship.position, self.ship.getHeading());
-
-                return _.any(gameObject.bodies, function (asteroidBody) {
-                    return SAT.testRayCircle(lineOfSightRay, asteroidBody.getCircleCollider());
-                });
-            }
-        );
-
-        if (thereIsAnAsteroidWithinTheLineOfSight) {
-            self.ship.fire();
-        }
-    };
 }(window.asteroids = window.asteroids || {}));
