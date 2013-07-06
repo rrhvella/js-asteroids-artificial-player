@@ -244,14 +244,14 @@
             asteroidBodyFuturePosition.clone().sub(bodyPosition).scale(0.5).add(bodyPosition),
             asteroidBodyFuturePosition.angleInRelationTo(bodyPosition),
             asteroidBody.parent.scale,
-            asteroidBodyFuturePosition.distanceTo(bodyPosition)
+            asteroidBodyFuturePosition.distanceTo(bodyPosition) + asteroidBody.parent.scale
         );
 
         var shipMovementProjectionBox = new SAT.RotatableBox(
             shipFuturePosition.clone().sub(self.ship.position).scale(0.5).add(self.ship.position),
             shipFuturePosition.angleInRelationTo(self.ship.position),
             self.ship.scale,
-            shipFuturePosition.distanceTo(self.ship.position)
+            shipFuturePosition.distanceTo(self.ship.position) + self.ship.scale
         );
 
         self._debugAsteroidProjectionBoxes.push(asteroidMovementProjectionBox);
