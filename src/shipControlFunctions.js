@@ -332,7 +332,12 @@
         var lookAheadTime = timeToBrake + timeToTurnAround + 1;
 
         var asteroidFuturePosition = asteroidVelocity.clone().scale(lookAheadTime).add(bodyPosition);
-        var shipFuturePosition = self.ship.velocity.clone().scale(lookAheadTime).add(self.ship.position);
+
+        var shipVelocity = self.ship.velocity.len();
+        var distanceTravelledByShip = shipVelocity * timeToBrake -
+            (self.ship.BRAKING_FORCE_MAGNITUDE * timeToBrake * timeToBrake) / 2;
+
+        var shipFuturePosition = self.ship.getHeading().scale(distanceTravelledByShip).add(self.ship.position);
 
         return {
             asteroidBodyFuturePosition: asteroidFuturePosition,
