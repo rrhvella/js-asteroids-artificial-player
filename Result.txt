@@ -1,7 +1,7 @@
 Number of games played:
 40
 Percentage of games won:
-50%
+42%
 Margin of error:
 15%
 Confidence Level:
