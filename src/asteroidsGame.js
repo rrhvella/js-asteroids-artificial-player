@@ -35,7 +35,7 @@
 
         var framesPerSecond = 30;
 
-        var updatesPerSecond = 20;
+        var updatesPerSecond = 120;
         self.debugMode = false;
 
         if (args.debugMode) {
@@ -43,7 +43,7 @@
                 throw "Can only use debug mode in conjunction with canvas, as debug information is visual";
             }
 
-            updatesPerSecond = 5;
+            updatesPerSecond = 30;
             self.debugMode = true;
         }
 

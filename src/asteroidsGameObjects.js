@@ -148,14 +148,14 @@
         );
     };
 
-    asteroids.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.035;
-    asteroids.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 20;
+    asteroids.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.006;
+    asteroids.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 4;
 
-    var brakingForceMagnitude = 2;
+    var brakingForceMagnitude = 0.1;
     asteroids.Ship.prototype.BRAKING_FORCE_MAGNITUDE = brakingForceMagnitude;
 
-    var accelerationMagnitude = 5;
-    asteroids.Ship.prototype.ACCELERATION_MAGNITUDE = 5;
+    var accelerationMagnitude = 0.3;
+    asteroids.Ship.prototype.ACCELERATION_MAGNITUDE = accelerationMagnitude;
 
     asteroids.Ship.prototype.ACTUAL_ACCELERATION_MAGNITUDE = accelerationMagnitude - brakingForceMagnitude;
 
@@ -239,7 +239,7 @@
             })
         );
 
-        self._timeLeftToShoot = 5;
+        self._timeLeftToShoot = 30;
     };
 
     asteroids.Projectile = function (args) {
@@ -258,8 +258,8 @@
         self.timeToDeath = self.NUMBER_OF_FRAMES_TO_DEATH;
     };
 
-    asteroids.Projectile.prototype.VELOCITY_MAGNITUDE = 30;
-    asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 10;
+    asteroids.Projectile.prototype.VELOCITY_MAGNITUDE = 5;
+    asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 60;
 
     asteroids.Projectile.prototype.MAX_DISTANCE = asteroids.Projectile.prototype.VELOCITY_MAGNITUDE *
         asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH;
@@ -282,8 +282,8 @@
     asteroids.Asteroid = function (args) {
         var self = this;
 
-        var maxAsteroidVelocityMagnitude = 10;
-        var minAsteroidVelocityMagnitude = 2;
+        var maxAsteroidVelocityMagnitude = 2;
+        var minAsteroidVelocityMagnitude = 0.5;
 
         var velocityRange = (maxAsteroidVelocityMagnitude - minAsteroidVelocityMagnitude);
         var asteroidVelocityMagnitude = minAsteroidVelocityMagnitude + Math.random() * velocityRange;
