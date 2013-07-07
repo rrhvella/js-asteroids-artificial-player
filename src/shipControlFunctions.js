@@ -67,13 +67,13 @@
         self._debugPursuidAsteroidCircleImage = new Image();
         self._debugPursuidAsteroidCircleImage.src = "media/redCircle.png";
 
-        self._debugAsteroidProjectionBoxImage = new Image();
-        self._debugAsteroidProjectionBoxImage.src = "media/blueBox.png";
+        self._debugProjectionBoxImage = new Image();
+        self._debugProjectionBoxImage.src = "media/blueBox.png";
 
         self._debugArrowImage = new Image();
         self._debugArrowImage.src = "media/redArrow.png";
 
-        self._debugAsteroidProjectionBoxes = null;
+        self._debugProjectionBoxes = null;
         self._debugAsteroidsAndFuturePositions = null;
         self._debugDesiredVelocity = null;
     };
@@ -130,7 +130,7 @@
         var drawingContext = self.game.getDrawingContext();
 
         _.each(
-            self._debugAsteroidProjectionBoxes,
+            self._debugProjectionBoxes,
             function (projectionBox) {
                 drawingContext.translate(projectionBox.centerPosition.x, projectionBox.centerPosition.y);
                 drawingContext.rotate(projectionBox.rotation);
@@ -139,7 +139,7 @@
                 drawingContext.translate(-0.5, -0.5);
 
                 drawingContext.drawImage(
-                    self._debugAsteroidProjectionBoxImage,
+                    self._debugProjectionBoxImage,
 
                     0,
                     0,
@@ -188,23 +188,9 @@
         var self = this;
 
         self._debugAsteroidsAndFuturePositions = [];
-        self._debugAsteroidProjectionBoxes = [];
+        self._debugProjectionBoxes = [];
 
-        var totalForce = new SAT.Vector(0, 0);
-
-        _.each(self.ship.game.getAsteroids(), function (asteroid) {
-            var avoidanceForce = null;
-
-            _.every(asteroid.bodies, function (asteroidBody) {
-                avoidanceForce = self._getAvoidanceForce(asteroidBody);
-
-                return avoidanceForce === null;
-            });
-
-            if (avoidanceForce !== null) {
-                totalForce.add(avoidanceForce);
-            }
-        });
+        var totalForce = self._getTotalAvoidanceForce();
 
         var noAsteroidsToAvoid = totalForce.x === 0 && totalForce.y === 0;
 
@@ -214,6 +200,85 @@
 
         self._controlShipBasedOnDesiredVelocity(totalForce);
         self._applyFireBehaviour();
+    };
+
+    asteroids.AIControlFunction.prototype._getTotalAvoidanceForce = function () {
+        var self = this;
+
+        var totalAvoidanceForce = new SAT.Vector(0, 0);
+
+        var timeToBrake = self.ship.velocity.len() / self.ship.BRAKING_FORCE_MAGNITUDE;
+
+        var shipVelocity = self.ship.velocity.len();
+        var distanceTravelledByShip = shipVelocity * timeToBrake -
+            (self.ship.BRAKING_FORCE_MAGNITUDE * timeToBrake * timeToBrake) / 2;
+
+        var shipFuturePosition = self.ship.getHeading().scale(distanceTravelledByShip).add(self.ship.position);
+
+        var shipMovementProjectionBox = self._getMovementProjectionBox(
+            self.ship.position,
+            shipFuturePosition,
+            self.ship.scale
+        );
+
+        var shipMovementProjectionBoxPolygon = shipMovementProjectionBox.toPolygon();
+
+        self._debugProjectionBoxes.push(shipMovementProjectionBox);
+
+        _.each(self.ship.game.getAsteroids(), function (asteroid) {
+            var avoidanceForce = null;
+
+            _.every(asteroid.bodies, function (asteroidBody) {
+                var bodyPosition = asteroidBody.getOffsetPosition();
+                var asteroidVelocity = asteroidBody.parent.velocity;
+
+                var timeToTurnAround = Math.PI / self.ship.ANGULAR_VELOCITY;
+
+                var lookAheadTime = timeToTurnAround + 1;
+                var asteroidBodyFuturePosition = asteroidVelocity.clone().scale(lookAheadTime).add(bodyPosition);
+
+                var asteroidMovementProjectionBox = self._getMovementProjectionBox(
+                    asteroidBody.getOffsetPosition(),
+                    asteroidBodyFuturePosition,
+                    asteroidBody.parent.scale
+                );
+
+                self._debugProjectionBoxes.push(asteroidMovementProjectionBox);
+
+                var projectionBoxesOverlap = SAT.testPolygonPolygon(
+                    shipMovementProjectionBoxPolygon,
+                    asteroidMovementProjectionBox.toPolygon()
+                );
+
+                if (!projectionBoxesOverlap) {
+                    return true;
+                }
+
+                var force = self.ship.position.clone().sub(asteroidBody.getOffsetPosition());
+                var forceMagnitude = self.ship.MAXIMUM_VELOCITY_MAGNITUDE;
+
+                avoidanceForce = force.normalize().scale(forceMagnitude);
+
+                return false;
+            });
+
+            if (avoidanceForce !== null) {
+                totalAvoidanceForce.add(avoidanceForce);
+            }
+        });
+
+        return totalAvoidanceForce;
+    };
+
+    asteroids.AIControlFunction.prototype._getMovementProjectionBox = function (currentPosition, futurePosition, scale) {
+        var projectionBox = new SAT.RotatableBox(
+            futurePosition.clone().sub(currentPosition).scale(0.5).add(currentPosition),
+            futurePosition.angleInRelationTo(currentPosition),
+            scale,
+            futurePosition.distanceTo(currentPosition) + scale
+        );
+
+        return projectionBox;
     };
 
     asteroids.AIControlFunction.prototype._getPursuitForce = function () {
@@ -257,47 +322,6 @@
         return futureBodyOffset.normalize().scale(forceMagnitude);
     };
 
-    asteroids.AIControlFunction.prototype._getAvoidanceForce = function (asteroidBody) {
-        var self = this;
-
-        var futurePositions = self._getFuturePositionsForAvoidance(asteroidBody);
-
-        var asteroidBodyFuturePosition = futurePositions.asteroidBodyFuturePosition;
-        var shipFuturePosition = futurePositions.shipFuturePosition;
-
-        var bodyPosition = asteroidBody.getOffsetPosition();
-
-        var asteroidMovementProjectionBox = new SAT.RotatableBox(
-            asteroidBodyFuturePosition.clone().sub(bodyPosition).scale(0.5).add(bodyPosition),
-            asteroidBodyFuturePosition.angleInRelationTo(bodyPosition),
-            asteroidBody.parent.scale,
-            asteroidBodyFuturePosition.distanceTo(bodyPosition) + asteroidBody.parent.scale
-        );
-
-        var shipMovementProjectionBox = new SAT.RotatableBox(
-            shipFuturePosition.clone().sub(self.ship.position).scale(0.5).add(self.ship.position),
-            shipFuturePosition.angleInRelationTo(self.ship.position),
-            self.ship.scale,
-            shipFuturePosition.distanceTo(self.ship.position) + self.ship.scale
-        );
-
-        self._debugAsteroidProjectionBoxes.push(asteroidMovementProjectionBox);
-
-        var projectionBoxesOverlap = SAT.testPolygonPolygon(
-            asteroidMovementProjectionBox.toPolygon(),
-            shipMovementProjectionBox.toPolygon()
-        );
-
-        if (!projectionBoxesOverlap) {
-            return null;
-        }
-
-        var force = self.ship.position.clone().sub(asteroidBody.getOffsetPosition());
-        var forceMagnitude = self.ship.MAXIMUM_VELOCITY_MAGNITUDE;
-
-        return force.normalize().scale(forceMagnitude);
-    };
-
     asteroids.AIControlFunction.prototype._getClosestAsteroidBody = function () {
         var self = this;
 
@@ -318,31 +342,6 @@
         }
 
         return closestAsteroid;
-    };
-
-    asteroids.AIControlFunction.prototype._getFuturePositionsForAvoidance = function (asteroidBody) {
-        var self = this;
-
-        var bodyPosition = asteroidBody.getOffsetPosition();
-        var asteroidVelocity = asteroidBody.parent.velocity;
-
-        var timeToBrake = self.ship.velocity.len() / self.ship.BRAKING_FORCE_MAGNITUDE;
-        var timeToTurnAround = Math.PI / self.ship.ANGULAR_VELOCITY;
-
-        var lookAheadTime = timeToBrake + timeToTurnAround + 1;
-
-        var asteroidFuturePosition = asteroidVelocity.clone().scale(lookAheadTime).add(bodyPosition);
-
-        var shipVelocity = self.ship.velocity.len();
-        var distanceTravelledByShip = shipVelocity * timeToBrake -
-            (self.ship.BRAKING_FORCE_MAGNITUDE * timeToBrake * timeToBrake) / 2;
-
-        var shipFuturePosition = self.ship.getHeading().scale(distanceTravelledByShip).add(self.ship.position);
-
-        return {
-            asteroidBodyFuturePosition: asteroidFuturePosition,
-            shipFuturePosition: shipFuturePosition
-        };
     };
 
     asteroids.AIControlFunction.prototype._getFutureAsteroidPositionForPursuit = function (asteroidBody) {
