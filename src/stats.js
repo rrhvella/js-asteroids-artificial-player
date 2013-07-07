@@ -31,7 +31,9 @@
 $(document).ready(function () {
     "use strict";
 
-    var numberOfGames = 200;
+    var match = location.search.match(/how-much=([0-9]*)/);
+
+    var numberOfGames = match ? match[1] : 10;
     var asteroidsGame = new asteroids.AsteroidsGame({ width: 800, height: 600 });
 
     var gamesWon = 0;
