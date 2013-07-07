@@ -221,6 +221,10 @@
     asteroids.AsteroidsGame.prototype.restart = function () {
         var self = this;
 
+        var numberOfAsteroids = 5;
+        var minStartingDistanceBetweenShipAndAsteroids = 250;
+        var distanceRange = _.min([self._width, self._height]) / 2 - minStartingDistanceBetweenShipAndAsteroids;
+
         var ship = new asteroids.Ship({
             game: self,
             position: new SAT.Vector(
@@ -235,40 +239,20 @@
             new asteroids.AIControlFunction({
                 game: self,
                 ship: ship
-            }),
-
-            new asteroids.Asteroid({
-                game: self,
-                position: new SAT.Vector(
-                    self._width * 0.25,
-                    self._height * 0.25
-                )
-            }),
-
-            new asteroids.Asteroid({
-                game: self,
-                position: new SAT.Vector(
-                    self._width * 0.75,
-                    self._height * 0.25
-                )
-            }),
-
-            new asteroids.Asteroid({
-                game: self,
-                position: new SAT.Vector(
-                    self._width * 0.25,
-                    self._height * 0.75
-                )
-            }),
-
-            new asteroids.Asteroid({
-                game: self,
-                position: new SAT.Vector(
-                    self._width * 0.75,
-                    self._height * 0.75
-                )
             })
         ];
+
+        var i;
+
+        for (i = 0; i < numberOfAsteroids; i += 1) {
+            var randomAsteroidPosition = SAT.randomNormal().scale(
+                    Math.random() * distanceRange + minStartingDistanceBetweenShipAndAsteroids
+                ).add(ship.position);
+
+            self.gameObjects.push(
+                new asteroids.Asteroid({ game: self, position: randomAsteroidPosition })
+            );
+        }
 
         self._gameWon = null;
         self._updatesLeftTillTimeDefeat = 10000;
@@ -331,7 +315,7 @@
 
         self._gameWon = args.won || false;
 
-        if(self.onGameOver) {
+        if (self.onGameOver) {
             self.onGameOver(self);
         }
     };
