@@ -57,8 +57,6 @@
         self.drawingFrameSize = 1000.0 / framesPerSecond;
         self.updateFrameSize = 1000.0 / updatesPerSecond;
 
-        self._updatesLeftTillTimeDefeat = 0;
-
         $(window).keydown(function (event) {
             self._recordKeyDown(event.which);
         });
@@ -210,12 +208,6 @@
         _.each(self.gameObjects, function (gameObject) {
             gameObject.update();
         });
-
-        self._updatesLeftTillTimeDefeat -= 1;
-
-        if (self._updatesLeftTillTimeDefeat === 0) {
-            self.gameOver({won: false});
-        }
     };
 
     asteroids.AsteroidsGame.prototype.restart = function () {
@@ -255,7 +247,6 @@
         }
 
         self._gameWon = null;
-        self._updatesLeftTillTimeDefeat = 10000;
     };
 
     asteroids.AsteroidsGame.prototype.detectCollisions = function () {
