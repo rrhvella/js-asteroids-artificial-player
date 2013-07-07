@@ -148,7 +148,7 @@
         );
     };
 
-    asteroids.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.006;
+    asteroids.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.012;
     asteroids.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 4;
 
     var brakingForceMagnitude = 0.1;
