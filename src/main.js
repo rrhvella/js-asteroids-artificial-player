@@ -36,7 +36,8 @@ $(document).ready(function () {
         height: 600,
         canvas: $("canvas#main")[0],
         onGameOver: function (game) { game.restart(); },
-        debugMode: window.location.search.indexOf('debug=true') != -1
+        debugMode: window.location.search.indexOf('debugMode=true') != -1,
+        humanControlled: window.location.search.indexOf('humanControlled=true') != -1
     });
 
     asteroidsGame.run();

@@ -36,7 +36,9 @@
         var framesPerSecond = 30;
 
         var updatesPerSecond = 120;
-        self.debugMode = false;
+
+        self.debugMode = (args.debugMode) ? true : false;
+        self.humanControlled = (args.humanControlled) ? true : false;
 
         if (args.debugMode) {
             if (!args.canvas) {
@@ -44,7 +46,6 @@
             }
 
             updatesPerSecond = 30;
-            self.debugMode = true;
         }
 
         self.setCanvas(args.canvas);
@@ -225,13 +226,12 @@
             )
         });
 
+        var controllerClass = (self.humanControlled) ? asteroids.HumanInputControlFunction : asteroids.AIControlFunction;
+        var controller = new controllerClass({ game: self, ship: ship });
+
         self.gameObjects = [
             ship,
-
-            new asteroids.AIControlFunction({
-                game: self,
-                ship: ship
-            })
+            controller
         ];
 
         var i;
