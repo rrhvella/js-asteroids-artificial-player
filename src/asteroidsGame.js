@@ -35,7 +35,7 @@
 
         var framesPerSecond = 30;
 
-        var updatesPerSecond = 120;
+        var updatesPerSecond = 60;
 
         self.debugMode = (args.debugMode) ? true : false;
         self.humanControlled = (args.humanControlled) ? true : false;
@@ -45,7 +45,7 @@
                 throw "Can only use debug mode in conjunction with canvas, as debug information is visual";
             }
 
-            updatesPerSecond = 30;
+            updatesPerSecond = 15;
         }
 
         self.setCanvas(args.canvas);
