@@ -53,9 +53,57 @@
     asteroids.AsteroidsGameObject.prototype.draw = function () {
         var self = this;
 
+        self.drawAtPositon(self.position);
+
+        var x = self.position.x;
+        var y = self.position.y;
+
+        var viewWidth = self.game.getWidth();
+        var viewHeight = self.game.getHeight();
+
+        var radius = self.getEnclosingCircleRadius();
+
+        var xReflectionDirection = 0;
+        var yReflectionDirection = 0;
+
+        if (x - radius < 0) {
+            xReflectionDirection = 1;
+        } else if (x + radius >= viewWidth) {
+            xReflectionDirection = -1;
+        }
+
+        if (y - radius < 0) {
+            yReflectionDirection = 1;
+        } else if (y + radius >= viewHeight) {
+            yReflectionDirection = -1;
+        }
+
+        if (yReflectionDirection !== 0) {
+            self.drawAtPositon(new SAT.Vector(x, y + viewHeight * yReflectionDirection));
+        }
+
+        if (xReflectionDirection !== 0) {
+            self.drawAtPositon(new SAT.Vector(x + viewWidth * xReflectionDirection, y));
+        }
+
+        var hasDiagonalReflection = yReflectionDirection !== 0 && xReflectionDirection !== 0;
+
+        if (hasDiagonalReflection) {
+            var diagonalReflectionPositon = new SAT.Vector(
+                x + viewWidth * xReflectionDirection,
+                y + viewHeight * yReflectionDirection
+            );
+
+            self.drawAtPositon(diagonalReflectionPositon);
+        }
+    };
+
+    asteroids.AsteroidsGameObject.prototype.drawAtPositon = function (position) {
+        var self = this;
+
         var drawingContext = self.game.getDrawingContext();
 
-        drawingContext.translate(self.position.x, self.position.y);
+        drawingContext.translate(position.x, position.y);
         drawingContext.rotate(self.rotation);
         drawingContext.scale(self.scale, self.scale);
 
