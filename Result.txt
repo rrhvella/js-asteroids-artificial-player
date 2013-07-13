@@ -1,7 +1,7 @@
 Number of games played:
 200
 Percentage of games won:
-84%
+62%
 Margin of error:
 7.000000000000001%
 Confidence Level:
