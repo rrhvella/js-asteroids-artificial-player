@@ -27,7 +27,7 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function () {
+define(["sat", "satExtensions"], function () {
     "use strict";
 
     var Ray = SAT.Ray;
@@ -147,4 +147,4 @@
 
         ok(SAT.testRayCircle(ray, circle));
     });
-}());
+});

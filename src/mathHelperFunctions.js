@@ -27,10 +27,12 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function (mathHelperFunctions) {
+define([], function () {
     "use strict";
 
-    mathHelperFunctions.normalizeAngle = function (angle) {
+    var moddef = {};
+
+    moddef.normalizeAngle = function (angle) {
         var twoPI = Math.PI * 2;
 
         angle = angle % twoPI;
@@ -42,9 +44,9 @@
         return angle;
     };
 
-    mathHelperFunctions.minAngularDifference = function (angle1, angle2) {
-        var angle1Normalized = mathHelperFunctions.normalizeAngle(angle1);
-        var angle2Normalized = mathHelperFunctions.normalizeAngle(angle2);
+    moddef.minAngularDifference = function (angle1, angle2) {
+        var angle1Normalized = moddef.normalizeAngle(angle1);
+        var angle2Normalized = moddef.normalizeAngle(angle2);
 
         var difference = Math.abs(angle1Normalized - angle2Normalized);
 
@@ -63,4 +65,6 @@
         return difference;
     };
 
-}(window.mathHelperFunctions = window.mathHelperFunctions || {}));
+    return moddef;
+});
+

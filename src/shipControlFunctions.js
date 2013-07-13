@@ -27,38 +27,40 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function (asteroids) {
+define(["mathHelperFunctions", "keyCodes", "asteroidsGameObjects"], function (mathHelperFunctions, keyCodes, asteroidsGameObjects) {
     "use strict";
 
-    asteroids.HumanInputControlFunction = function (args) {
+    var moddef = {};
+
+    moddef.HumanInputControlFunction = function (args) {
         var self = this;
 
         self.game = args.game;
         self.ship = args.ship;
     };
 
-    asteroids.HumanInputControlFunction.prototype.draw = function () {
+    moddef.HumanInputControlFunction.prototype.draw = function () {
     };
 
-    asteroids.HumanInputControlFunction.prototype.update = function () {
+    moddef.HumanInputControlFunction.prototype.update = function () {
         var self = this;
 
-        if (self.game.isKeyDown(asteroids.KeyCodes.UP)) {
+        if (self.game.isKeyDown(keyCodes.UP)) {
             self.ship.accelerate();
         }
 
-        if (self.game.isKeyDown(asteroids.KeyCodes.RIGHT)) {
+        if (self.game.isKeyDown(keyCodes.RIGHT)) {
             self.ship.turn(1);
-        } else if (self.game.isKeyDown(asteroids.KeyCodes.LEFT)) {
+        } else if (self.game.isKeyDown(keyCodes.LEFT)) {
             self.ship.turn(-1);
         }
 
-        if (self.game.isKeyDown(asteroids.KeyCodes.SPACE)) {
+        if (self.game.isKeyDown(keyCodes.SPACE)) {
             self.ship.fire();
         }
     };
 
-    asteroids.AIControlFunction = function (args) {
+    moddef.AIControlFunction = function (args) {
         var self = this;
 
         self.ship = args.ship;
@@ -78,7 +80,7 @@
         self._debugDesiredVelocity = null;
     };
 
-    asteroids.AIControlFunction.prototype.draw = function () {
+    moddef.AIControlFunction.prototype.draw = function () {
         var self = this;
 
         if (self.game.debugMode) {
@@ -88,7 +90,7 @@
         }
     };
 
-    asteroids.AIControlFunction.prototype._drawAsteroidCurrentAndFuturePositionsDebugCircles = function () {
+    moddef.AIControlFunction.prototype._drawAsteroidCurrentAndFuturePositionsDebugCircles = function () {
         var self = this;
 
         var drawingContext = self.game.getDrawingContext();
@@ -124,7 +126,7 @@
         });
     };
 
-    asteroids.AIControlFunction.prototype._drawAsteroidProjectionBoxes = function () {
+    moddef.AIControlFunction.prototype._drawAsteroidProjectionBoxes = function () {
         var self = this;
 
         var drawingContext = self.game.getDrawingContext();
@@ -153,7 +155,7 @@
         );
     };
 
-    asteroids.AIControlFunction.prototype._drawDesiredVelocityDebugArrow = function () {
+    moddef.AIControlFunction.prototype._drawDesiredVelocityDebugArrow = function () {
         var self = this;
 
         if (!self._debugDesiredVelocity) {
@@ -184,7 +186,7 @@
         twoDContextHelperFunctions.resetTransform(drawingContext);
     };
 
-    asteroids.AIControlFunction.prototype.update = function () {
+    moddef.AIControlFunction.prototype.update = function () {
         var self = this;
 
         self._debugAsteroidsAndFuturePositions = [];
@@ -202,7 +204,7 @@
         self._applyFireBehaviour();
     };
 
-    asteroids.AIControlFunction.prototype._getTotalAvoidanceForce = function () {
+    moddef.AIControlFunction.prototype._getTotalAvoidanceForce = function () {
         var self = this;
 
         var totalAvoidanceForce = new SAT.Vector(0, 0);
@@ -270,7 +272,7 @@
         return totalAvoidanceForce;
     };
 
-    asteroids.AIControlFunction.prototype._getMovementProjectionBox = function (currentPosition, futurePosition, scale) {
+    moddef.AIControlFunction.prototype._getMovementProjectionBox = function (currentPosition, futurePosition, scale) {
         var projectionBox = new SAT.RotatableBox(
             futurePosition.clone().sub(currentPosition).scale(0.5).add(currentPosition),
             futurePosition.angleInRelationTo(currentPosition),
@@ -281,7 +283,7 @@
         return projectionBox;
     };
 
-    asteroids.AIControlFunction.prototype._getPursuitForce = function () {
+    moddef.AIControlFunction.prototype._getPursuitForce = function () {
         var self = this;
 
         var closestAsteroidBody = self._getClosestAsteroidBody();
@@ -299,7 +301,7 @@
 
         var asteroidRadius = closestAsteroidBody.parent.getEnclosingCircleRadius();
         var shipRadius = self.ship.getEnclosingCircleRadius();
-        var alteredProjectileDistance = asteroids.Projectile.prototype.MAX_DISTANCE * shipProximityFactor;
+        var alteredProjectileDistance = asteroidsGameObjects.Projectile.prototype.MAX_DISTANCE * shipProximityFactor;
 
         var forceMagnitude = futureBodyOffset.len() -
             asteroidRadius - shipRadius - alteredProjectileDistance;
@@ -322,7 +324,7 @@
         return futureBodyOffset.normalize().scale(forceMagnitude);
     };
 
-    asteroids.AIControlFunction.prototype._getClosestAsteroidBody = function () {
+    moddef.AIControlFunction.prototype._getClosestAsteroidBody = function () {
         var self = this;
 
         var asteroidGameObjects = self.ship.game.getAsteroids();
@@ -344,7 +346,7 @@
         return closestAsteroid;
     };
 
-    asteroids.AIControlFunction.prototype._getFutureAsteroidPositionForPursuit = function (asteroidBody) {
+    moddef.AIControlFunction.prototype._getFutureAsteroidPositionForPursuit = function (asteroidBody) {
         var self = this;
 
         var bodyPosition = asteroidBody.getOffsetPosition();
@@ -356,7 +358,7 @@
     };
 
 
-    asteroids.AIControlFunction.prototype._combinedAsteroidBodyDistance = function (asteroidBody) {
+    moddef.AIControlFunction.prototype._combinedAsteroidBodyDistance = function (asteroidBody) {
         var self = this;
 
         var bodyPosition = asteroidBody.getOffsetPosition();
@@ -374,7 +376,7 @@
             angularDistance / self.ship.ANGULAR_VELOCITY;
     };
 
-    asteroids.AIControlFunction.prototype._controlShipBasedOnDesiredVelocity = function (desiredVelocity) {
+    moddef.AIControlFunction.prototype._controlShipBasedOnDesiredVelocity = function (desiredVelocity) {
         var self = this;
 
         if (desiredVelocity.x === 0 && desiredVelocity.y === 0) {
@@ -396,7 +398,7 @@
         }
     };
 
-    asteroids.AIControlFunction.prototype._turnShipTowardsAngle = function (angle) {
+    moddef.AIControlFunction.prototype._turnShipTowardsAngle = function (angle) {
         var self = this;
 
         var normalizedShipRotation = mathHelperFunctions.normalizeAngle(self.ship.rotation);
@@ -425,7 +427,7 @@
         }
     };
 
-    asteroids.AIControlFunction.prototype._applyFireBehaviour = function () {
+    moddef.AIControlFunction.prototype._applyFireBehaviour = function () {
         var self = this;
 
         var thereIsAnAsteroidWithinTheLineOfSight = _.any(
@@ -443,4 +445,6 @@
             self.ship.fire();
         }
     };
-}(window.asteroids = window.asteroids || {}));
+
+    return moddef;
+});

@@ -27,10 +27,12 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function (asteroids) {
+define(["asteroidsGameObjects", "shipControlFunctions", "sat", "underscore"], function (asteroidsGameObjects, shipControlFunctions) {
     "use strict";
 
-    asteroids.AsteroidsGame = function (args) {
+    var moddef = {};
+
+    moddef.AsteroidsGame = function (args) {
         var self = this;
 
         var framesPerSecond = 30;
@@ -68,14 +70,14 @@
 
         self._ignoredCollisions = {};
         self.addIgnoredCollisionBetweenTypes(
-            asteroids.Asteroid.prototype.OBJECT_TYPE,
-            asteroids.Asteroid.prototype.OBJECT_TYPE
+            asteroidsGameObjects.Asteroid.prototype.OBJECT_TYPE,
+            asteroidsGameObjects.Asteroid.prototype.OBJECT_TYPE
         );
 
         self.onGameOver = args.onGameOver;
     };
 
-    asteroids.AsteroidsGame.prototype.setCanvas = function (canvas) {
+    moddef.AsteroidsGame.prototype.setCanvas = function (canvas) {
         var self = this;
 
         self._canvas = canvas;
@@ -87,25 +89,25 @@
         }
     };
 
-    asteroids.AsteroidsGame.prototype.getDrawingContext = function () {
+    moddef.AsteroidsGame.prototype.getDrawingContext = function () {
         var self = this;
 
         return self._drawingContext;
     };
 
-    asteroids.AsteroidsGame.prototype.getWidth = function () {
+    moddef.AsteroidsGame.prototype.getWidth = function () {
         var self = this;
 
         return self._width;
     };
 
-    asteroids.AsteroidsGame.prototype.getHeight = function () {
+    moddef.AsteroidsGame.prototype.getHeight = function () {
         var self = this;
 
         return self._height;
     };
 
-    asteroids.AsteroidsGame.prototype.setWidth = function (width) {
+    moddef.AsteroidsGame.prototype.setWidth = function (width) {
         var self = this;
 
         self._width = width;
@@ -115,7 +117,7 @@
         }
     };
 
-    asteroids.AsteroidsGame.prototype.setHeight = function (height) {
+    moddef.AsteroidsGame.prototype.setHeight = function (height) {
         var self = this;
 
         self._height = height;
@@ -125,19 +127,19 @@
         }
     };
 
-    asteroids.AsteroidsGame.prototype._recordKeyDown = function (code) {
+    moddef.AsteroidsGame.prototype._recordKeyDown = function (code) {
         var self = this;
 
         self._keysDownDict[code] = true;
     };
 
-    asteroids.AsteroidsGame.prototype._recordKeyUp = function (code) {
+    moddef.AsteroidsGame.prototype._recordKeyUp = function (code) {
         var self = this;
 
         delete self._keysDownDict[code];
     };
 
-    asteroids.AsteroidsGame.prototype.playGame = function () {
+    moddef.AsteroidsGame.prototype.playGame = function () {
         var self = this;
 
         self.restart();
@@ -154,7 +156,7 @@
         };
     };
 
-    asteroids.AsteroidsGame.prototype.addIgnoredCollisionBetweenTypes = function (objectType1, objectType2) {
+    moddef.AsteroidsGame.prototype.addIgnoredCollisionBetweenTypes = function (objectType1, objectType2) {
         var self = this;
 
         if (!(objectType1 in self._ignoredCollisions)) {
@@ -164,7 +166,7 @@
         self._ignoredCollisions[objectType1][objectType2] = true;
     };
 
-    asteroids.AsteroidsGame.prototype.collissionIgnoredBetweenObjects = function (object1, object2) {
+    moddef.AsteroidsGame.prototype.collissionIgnoredBetweenObjects = function (object1, object2) {
         var self = this;
 
         var objectType1 = object1.OBJECT_TYPE;
@@ -177,13 +179,13 @@
         return objectType2 in self._ignoredCollisions[objectType1];
     };
 
-    asteroids.AsteroidsGame.prototype.isKeyDown = function (code) {
+    moddef.AsteroidsGame.prototype.isKeyDown = function (code) {
         var self = this;
 
         return self._keysDownDict[code] === true;
     };
 
-    asteroids.AsteroidsGame.prototype.draw = function () {
+    moddef.AsteroidsGame.prototype.draw = function () {
         var self = this;
 
         self._drawingContext.clearRect(0, 0, self._canvas.width, self._canvas.height);
@@ -193,15 +195,15 @@
         });
     };
 
-    asteroids.AsteroidsGame.prototype.getAsteroids = function () {
+    moddef.AsteroidsGame.prototype.getAsteroids = function () {
         var self = this;
 
         return _.filter(self.gameObjects, function (gameObject) {
-            return gameObject.OBJECT_TYPE === asteroids.Asteroid.prototype.OBJECT_TYPE;
+            return gameObject.OBJECT_TYPE === asteroidsGameObjects.Asteroid.prototype.OBJECT_TYPE;
         });
     };
 
-    asteroids.AsteroidsGame.prototype.update = function () {
+    moddef.AsteroidsGame.prototype.update = function () {
         var self = this;
 
         self.detectCollisions();
@@ -211,14 +213,14 @@
         });
     };
 
-    asteroids.AsteroidsGame.prototype.restart = function () {
+    moddef.AsteroidsGame.prototype.restart = function () {
         var self = this;
 
         var numberOfAsteroids = 5;
         var minStartingDistanceBetweenShipAndAsteroids = 250;
         var distanceRange = _.min([self._width, self._height]) / 2 - minStartingDistanceBetweenShipAndAsteroids;
 
-        var ship = new asteroids.Ship({
+        var ship = new asteroidsGameObjects.Ship({
             game: self,
             position: new SAT.Vector(
                 self._width * 0.5,
@@ -226,7 +228,12 @@
             )
         });
 
-        var controllerClass = (self.humanControlled) ? asteroids.HumanInputControlFunction : asteroids.AIControlFunction;
+        var controllerClass = shipControlFunctions.AIControlFunction;
+
+        if (self.humanControlled) {
+            controllerClass = shipControlFunctions.HumanInputControlFunction;
+        }
+
         var controller = new controllerClass({ game: self, ship: ship });
 
         self.gameObjects = [
@@ -238,18 +245,18 @@
 
         for (i = 0; i < numberOfAsteroids; i += 1) {
             var randomAsteroidPosition = SAT.randomNormal().scale(
-                    Math.random() * distanceRange + minStartingDistanceBetweenShipAndAsteroids
-                ).add(ship.position);
+                Math.random() * distanceRange + minStartingDistanceBetweenShipAndAsteroids
+            ).add(ship.position);
 
             self.gameObjects.push(
-                new asteroids.Asteroid({ game: self, position: randomAsteroidPosition })
+                new asteroidsGameObjects.Asteroid({ game: self, position: randomAsteroidPosition })
             );
         }
 
         self._gameWon = null;
     };
 
-    asteroids.AsteroidsGame.prototype.detectCollisions = function () {
+    moddef.AsteroidsGame.prototype.detectCollisions = function () {
         var self = this;
         var i;
         var j;
@@ -260,7 +267,6 @@
             if (!firstObject.bodies) {
                 continue;
             }
-
 
             for (j = i; j < self.gameObjects.length; j += 1) {
                 var secondObject = self.gameObjects[j];
@@ -281,7 +287,7 @@
         }
     };
 
-    asteroids.AsteroidsGame.prototype.testCollissionBetweenObjects = function (firstObject, secondObject) {
+    moddef.AsteroidsGame.prototype.testCollissionBetweenObjects = function (firstObject, secondObject) {
         return _.any(firstObject.bodies, function (firstBody) {
             return _.any(secondObject.bodies, function (secondBody) {
                 var firstCollider = firstBody.getCircleCollider();
@@ -292,7 +298,7 @@
         });
     };
 
-    asteroids.AsteroidsGame.prototype.run = function () {
+    moddef.AsteroidsGame.prototype.run = function () {
         var self = this;
 
         self.restart();
@@ -301,7 +307,7 @@
         setInterval(_.bind(self.update, self), self.updateFrameSize);
     };
 
-    asteroids.AsteroidsGame.prototype.gameOver = function (args) {
+    moddef.AsteroidsGame.prototype.gameOver = function (args) {
         var self = this;
 
         self._gameWon = args.won || false;
@@ -310,4 +316,6 @@
             self.onGameOver(self);
         }
     };
-}(window.asteroids = window.asteroids || {}));
+
+    return moddef;
+});

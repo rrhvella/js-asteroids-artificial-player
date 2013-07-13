@@ -27,10 +27,11 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function (asteroids) {
+define([], function () {
     "use strict";
 
-    asteroids.KeyCodes = {
+
+    return {
         UP: 38,
         DOWN: 40,
 
@@ -39,5 +40,5 @@
 
         SPACE: 32
     };
-}(window.asteroids = window.asteroids || {}));
+});
 

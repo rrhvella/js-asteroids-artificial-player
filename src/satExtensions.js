@@ -27,115 +27,117 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function (SAT) {
+define(["mathHelperFunctions", "sat"], function (mathHelperFunctions) {
     "use strict";
 
-    SAT.angleToNormal = function (angle) {
-        return new SAT.Vector(-Math.sin(angle), Math.cos(angle));
-    };
+    (function (SAT) {
+        SAT.angleToNormal = function (angle) {
+            return new SAT.Vector(-Math.sin(angle), Math.cos(angle));
+        };
 
-    SAT.randomNormal = function () {
-        return SAT.angleToNormal(Math.random() * 2 * Math.PI);
-    };
+        SAT.randomNormal = function () {
+            return SAT.angleToNormal(Math.random() * 2 * Math.PI);
+        };
 
-    SAT.Vector.prototype.clamp = function (maximumMagnitude) {
-        var self = this;
+        SAT.Vector.prototype.clamp = function (maximumMagnitude) {
+            var self = this;
 
-        if (self.len() > maximumMagnitude) {
-            self.normalize().scale(maximumMagnitude);
-        }
-    };
+            if (self.len() > maximumMagnitude) {
+                self.normalize().scale(maximumMagnitude);
+            }
+        };
 
-    SAT.Vector.prototype.angle = function () {
-        var self = this;
+        SAT.Vector.prototype.angle = function () {
+            var self = this;
 
-        return mathHelperFunctions.normalizeAngle(Math.atan2(-self.x, self.y));
-    };
+            return mathHelperFunctions.normalizeAngle(Math.atan2(-self.x, self.y));
+        };
 
-    SAT.Vector.prototype.distanceTo = function (other) {
-        var self = this;
+        SAT.Vector.prototype.distanceTo = function (other) {
+            var self = this;
 
-        return self.clone().sub(other).len();
-    };
+            return self.clone().sub(other).len();
+        };
 
-    SAT.Vector.prototype.angleInRelationTo = function (other) {
-        var self = this;
+        SAT.Vector.prototype.angleInRelationTo = function (other) {
+            var self = this;
 
-        return self.clone().sub(other).angle();
-    };
+            return self.clone().sub(other).angle();
+        };
 
-    SAT.Vector.prototype.clone = function () {
-        var self = this;
+        SAT.Vector.prototype.clone = function () {
+            var self = this;
 
-        return new SAT.Vector(self.x, self.y);
-    };
+            return new SAT.Vector(self.x, self.y);
+        };
 
-    SAT.Ray = function (origin, direction) {
-        var self = this;
+        SAT.Ray = function (origin, direction) {
+            var self = this;
 
-        self.origin = origin ? origin.clone() : new SAT.Vector();
+            self.origin = origin ? origin.clone() : new SAT.Vector();
 
-        if (direction) {
-            self.direction = direction.clone().normalize();
-        } else {
-            self.direction = new SAT.Vector();
-        }
-    };
+            if (direction) {
+                self.direction = direction.clone().normalize();
+            } else {
+                self.direction = new SAT.Vector();
+            }
+        };
 
-    SAT.RotatableBox = function (centerPosition, rotation, width, height) {
-        var self = this;
+        SAT.RotatableBox = function (centerPosition, rotation, width, height) {
+            var self = this;
 
-        self.centerPosition = centerPosition;
-        self.rotation = rotation;
+            self.centerPosition = centerPosition;
+            self.rotation = rotation;
 
-        self.width = width;
-        self.height = height;
-    };
+            self.width = width;
+            self.height = height;
+        };
 
-    SAT.RotatableBox.prototype.toPolygon = function () {
-        var self = this;
+        SAT.RotatableBox.prototype.toPolygon = function () {
+            var self = this;
 
-        var xAxisOrientation = mathHelperFunctions.normalizeAngle(self.rotation - Math.PI / 2);
-        var yAxisOrientation = self.rotation;
+            var xAxisOrientation = mathHelperFunctions.normalizeAngle(self.rotation - Math.PI / 2);
+            var yAxisOrientation = self.rotation;
 
-        var xAxis = SAT.angleToNormal(xAxisOrientation);
-        var yAxis = SAT.angleToNormal(yAxisOrientation);
+            var xAxis = SAT.angleToNormal(xAxisOrientation);
+            var yAxis = SAT.angleToNormal(yAxisOrientation);
 
-        var halfWidth = self.width / 2;
-        var halfHeight = self.height / 2;
+            var halfWidth = self.width / 2;
+            var halfHeight = self.height / 2;
 
-        return new SAT.Polygon(
-            self.centerPosition.clone(),
-            [
-                xAxis.clone().scale(-halfWidth).add(yAxis.clone().scale(-halfHeight)),
-                xAxis.clone().scale(-halfWidth).add(yAxis.clone().scale(halfHeight)),
-                xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(halfHeight)),
-                xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(-halfHeight))
-            ]
-        );
-    };
+            return new SAT.Polygon(
+                self.centerPosition.clone(),
+                [
+                    xAxis.clone().scale(-halfWidth).add(yAxis.clone().scale(-halfHeight)),
+                    xAxis.clone().scale(-halfWidth).add(yAxis.clone().scale(halfHeight)),
+                    xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(halfHeight)),
+                    xAxis.clone().scale(halfWidth).add(yAxis.clone().scale(-halfHeight))
+                ]
+            );
+        };
 
-    SAT.testRayCircle = function (ray, circle) {
-        if (ray.direction.x === 0 && ray.direction.y === 0) {
-            return false;
-        }
+        SAT.testRayCircle = function (ray, circle) {
+            if (ray.direction.x === 0 && ray.direction.y === 0) {
+                return false;
+            }
 
-        var ox = ray.origin.x - circle.pos.x;
-        var oy = ray.origin.y - circle.pos.y;
+            var ox = ray.origin.x - circle.pos.x;
+            var oy = ray.origin.y - circle.pos.y;
 
-        var dx = ray.direction.x;
-        var dy = ray.direction.y;
+            var dx = ray.direction.x;
+            var dy = ray.direction.y;
 
-        var rSquared = circle.r * circle.r;
+            var rSquared = circle.r * circle.r;
 
-        var rootInput = rSquared * dx * dx - Math.pow(dy * ox - dx * oy, 2) + rSquared * dy * dy;
+            var rootInput = rSquared * dx * dx - Math.pow(dy * ox - dx * oy, 2) + rSquared * dy * dy;
 
-        if (rootInput < 0) {
-            return false;
-        }
+            if (rootInput < 0) {
+                return false;
+            }
 
-        var dotOriginDirection = dx * ox + dy * oy;
+            var dotOriginDirection = dx * ox + dy * oy;
 
-        return Math.sqrt(rootInput) > dotOriginDirection;
-    };
-}(window.SAT = window.SAT || {}));
+            return Math.sqrt(rootInput) > dotOriginDirection;
+        };
+    }(window.SAT = window.SAT || {}));
+});

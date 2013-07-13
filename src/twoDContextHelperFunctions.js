@@ -27,11 +27,14 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function (twoDContextHelperFunctions) {
+define([], function () {
     "use strict";
 
-    twoDContextHelperFunctions.resetTransform = function (context) {
+    var moddef = {};
+
+    moddef.resetTransform = function (context) {
         context.setTransform(1, 0, 0, 1, 0, 0);
     };
 
-}(window.twoDContextHelperFunctions = window.twoDContextHelperFunctions || {}));
+    return moddef;
+});

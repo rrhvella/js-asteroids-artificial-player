@@ -4,16 +4,16 @@
     <title>
         js Asteroids Artificial Player Tests
     </title>
+
     <link rel="stylesheet" href="lib/qunit.css">
     <script type="text/javascript" src="lib/qunit.js"></script>
 
-    <script type="text/javascript" src="src/mathHelperFunctions.js"></script>
-    <script type="text/javascript" src="tests/mathHelperFunctionsTests.js"></script>
+    <script type="text/javascript" >
+        //Prevent QUnit from starting automatically.
+        QUnit.config.autostart = false;
+    </script>
 
-    <script type="text/javascript" src="lib/underscore.js"></script>
-    <script type="text/javascript" src="lib/sat.js"></script>
-    <script type="text/javascript" src="src/satExtensions.js"></script>
-    <script type="text/javascript" src="tests/satExtensionsTest.js"></script>
+    <script type="text/javascript" data-main="tests/main" src="lib/require.js"></script>
 </head>
 <body>
 <div id="qunit"></div>

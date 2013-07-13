@@ -29,41 +29,19 @@
 
 require.config({
     paths: {
+        "sat": "../lib/sat",
         "jquery": "../lib/jquery",
-        "underscore": "../lib/underscore",
-        "sat": "../lib/sat"
+        "satExtensions": "../src/satExtensions",
+        "mathHelperFunctions": "../src/mathHelperFunctions"
     }
 });
 
-require(["asteroidsGame", "jquery"], function (asteroidsGame) {
+require(["mathHelperFunctionsTests", "satExtensionsTest", "jquery"], function () {
     "use strict";
 
-    var match = location.search.match(/how-much=([0-9]*)/);
-
-    var numberOfGames = match ? match[1] : 10;
-    var asteroidsGameInstance = new asteroidsGame.AsteroidsGame({ width: 800, height: 600 });
-
-    var gamesWon = 0;
-
-    var i;
-
-    for (i = 0; i < numberOfGames; i += 1) {
-        var stats = asteroidsGameInstance.playGame();
-
-        gamesWon += (stats.gameWon === true) ? 1 : 0;
-    }
-
-    var ratioOfGamesWon = gamesWon / numberOfGames;
-    var confidenceLevel = 0.95;
-
-    var marginOfError = 1.96 / (2 * Math.sqrt(numberOfGames));
-
-    var formatAsPercentage = function (ratio) {
-        return ratio.toFixed(2) * 100 + "%";
-    };
-
-    $("div#numberOfGames").text(numberOfGames);
-    $("div#percentageOfGamesWon").text(formatAsPercentage(ratioOfGamesWon));
-    $("div#confidenceLevel").text(formatAsPercentage(confidenceLevel));
-    $("div#marginOfError").text(formatAsPercentage(marginOfError));
+    $(document).ready(
+        function () {
+            QUnit.start();
+        }
+    );
 });

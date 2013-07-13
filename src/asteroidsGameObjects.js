@@ -28,10 +28,12 @@
  */
 
 
-(function (asteroids) {
+define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satExtensions"], function (mathHelperFunctions, twoDContextHelperFunctions) {
     "use strict";
 
-    asteroids.AsteroidsGameObject = function (args) {
+    var moddef = {};
+
+    moddef.AsteroidsGameObject = function (args) {
         var self = this;
 
         self.game = args.game;
@@ -47,10 +49,10 @@
 
         self.velocity = args.velocity ? args.velocity.clone() : new SAT.Vector(0, 0);
 
-        self.bodies = [ new asteroids.AsteroidsGameObjectBody({ parent: self }) ];
+        self.bodies = [ new moddef.AsteroidsGameObjectBody({ parent: self }) ];
     };
 
-    asteroids.AsteroidsGameObject.prototype.draw = function () {
+    moddef.AsteroidsGameObject.prototype.draw = function () {
         var self = this;
 
         self.drawAtPositon(self.position);
@@ -98,7 +100,7 @@
         }
     };
 
-    asteroids.AsteroidsGameObject.prototype.drawAtPositon = function (position) {
+    moddef.AsteroidsGameObject.prototype.drawAtPositon = function (position) {
         var self = this;
 
         var drawingContext = self.game.getDrawingContext();
@@ -114,7 +116,7 @@
         twoDContextHelperFunctions.resetTransform(drawingContext);
     };
 
-    asteroids.AsteroidsGameObject.prototype.update = function () {
+    moddef.AsteroidsGameObject.prototype.update = function () {
         var self = this;
 
         var x = self.position.x;
@@ -143,46 +145,46 @@
         self.position.add(self.velocity);
     };
 
-    asteroids.AsteroidsGameObject.prototype.kill = function () {
+    moddef.AsteroidsGameObject.prototype.kill = function () {
         var self = this;
 
         self.game.gameObjects = _.without(self.game.gameObjects, self);
     };
 
-    asteroids.AsteroidsGameObject.prototype.getEnclosingCircleRadius = function () {
+    moddef.AsteroidsGameObject.prototype.getEnclosingCircleRadius = function () {
         var self = this;
 
         return self.scale / 2;
     };
 
-    asteroids.AsteroidsGameObject.prototype.collidedWith = function (gameObject) {
+    moddef.AsteroidsGameObject.prototype.collidedWith = function (gameObject) {
     };
 
-    asteroids.AsteroidsGameObjectBody = function (args) {
+    moddef.AsteroidsGameObjectBody = function (args) {
         var self = this;
 
         self.parent = args.parent;
         self.offsetFromParent = args.offsetFromParent ? args.offsetFromParent.clone() : new SAT.Vector(0, 0);
     };
 
-    asteroids.AsteroidsGameObjectBody.prototype.getCircleCollider = function () {
+    moddef.AsteroidsGameObjectBody.prototype.getCircleCollider = function () {
         var self = this;
 
         return new SAT.Circle(self.getOffsetPosition(), self.parent.getEnclosingCircleRadius());
     };
 
-    asteroids.AsteroidsGameObjectBody.prototype.getOffsetPosition = function () {
+    moddef.AsteroidsGameObjectBody.prototype.getOffsetPosition = function () {
         var self = this;
 
         return self.parent.position.clone().add(self.offsetFromParent);
     };
 
-    asteroids.Ship = function (args) {
+    moddef.Ship = function (args) {
         var self = this;
 
         self._timeLeftToShoot = 0;
 
-        asteroids.AsteroidsGameObject.call(
+        moddef.AsteroidsGameObject.call(
             self,
             {
                 game: args.game,
@@ -196,21 +198,21 @@
         );
     };
 
-    asteroids.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.025;
-    asteroids.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 8;
+    moddef.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.025;
+    moddef.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 8;
 
     var brakingForceMagnitude = 0.2;
-    asteroids.Ship.prototype.BRAKING_FORCE_MAGNITUDE = brakingForceMagnitude;
+    moddef.Ship.prototype.BRAKING_FORCE_MAGNITUDE = brakingForceMagnitude;
 
     var accelerationMagnitude = 0.6;
-    asteroids.Ship.prototype.ACCELERATION_MAGNITUDE = accelerationMagnitude;
+    moddef.Ship.prototype.ACCELERATION_MAGNITUDE = accelerationMagnitude;
 
-    asteroids.Ship.prototype.ACTUAL_ACCELERATION_MAGNITUDE = accelerationMagnitude - brakingForceMagnitude;
+    moddef.Ship.prototype.ACTUAL_ACCELERATION_MAGNITUDE = accelerationMagnitude - brakingForceMagnitude;
 
-    _.extend(asteroids.Ship.prototype, asteroids.AsteroidsGameObject.prototype);
-    asteroids.Ship.prototype.constructor = asteroids.Ship;
+    _.extend(moddef.Ship.prototype, moddef.AsteroidsGameObject.prototype);
+    moddef.Ship.prototype.constructor = moddef.Ship;
 
-    asteroids.Ship.prototype.getHeading = function () {
+    moddef.Ship.prototype.getHeading = function () {
         var self = this;
 
         self.rotation = mathHelperFunctions.normalizeAngle(self.rotation);
@@ -221,29 +223,29 @@
         return result;
     };
 
-    asteroids.Ship.prototype.collidedWith = function (gameObject) {
+    moddef.Ship.prototype.collidedWith = function (gameObject) {
         var self = this;
 
-        if (gameObject.OBJECT_TYPE === asteroids.Asteroid.prototype.OBJECT_TYPE) {
+        if (gameObject.OBJECT_TYPE === moddef.Asteroid.prototype.OBJECT_TYPE) {
             self.game.gameOver({won: false});
         }
     };
 
-    asteroids.Ship.prototype.accelerate = function () {
+    moddef.Ship.prototype.accelerate = function () {
         var self = this;
 
         self.velocity.add(self.getHeading().scale(self.ACCELERATION_MAGNITUDE));
         self.velocity.clamp(self.MAXIMUM_VELOCITY_MAGNITUDE);
     };
 
-    asteroids.Ship.prototype.turn = function (direction) {
+    moddef.Ship.prototype.turn = function (direction) {
         var self = this;
 
         self.rotation += self.ANGULAR_VELOCITY * direction;
         self.rotation = mathHelperFunctions.normalizeAngle(self.rotation);
     };
 
-    asteroids.Ship.prototype.update = function () {
+    moddef.Ship.prototype.update = function () {
         var self = this;
 
         self.brake();
@@ -252,10 +254,10 @@
             self._timeLeftToShoot -= 1;
         }
 
-        asteroids.AsteroidsGameObject.prototype.update.call(self);
+        moddef.AsteroidsGameObject.prototype.update.call(self);
     };
 
-    asteroids.Ship.prototype.brake = function () {
+    moddef.Ship.prototype.brake = function () {
         var self = this;
 
         var velocityMagnitudeSquared = self.velocity.len2();
@@ -271,7 +273,7 @@
         }
     };
 
-    asteroids.Ship.prototype.fire = function () {
+    moddef.Ship.prototype.fire = function () {
         var self = this;
 
         if (self._timeLeftToShoot !== 0) {
@@ -279,7 +281,7 @@
         }
 
         self.game.gameObjects.push(
-            new asteroids.Projectile({
+            new moddef.Projectile({
                 game: self.game,
 
                 position: self.position.clone(),
@@ -290,12 +292,12 @@
         self._timeLeftToShoot = 15;
     };
 
-    asteroids.Projectile = function (args) {
+    moddef.Projectile = function (args) {
         var self = this;
 
         var velocity = args.direction.scale(self.VELOCITY_MAGNITUDE);
 
-        asteroids.AsteroidsGameObject.call(self, {
+        moddef.AsteroidsGameObject.call(self, {
             game: args.game,
             scale: 5,
             velocity: velocity,
@@ -306,16 +308,16 @@
         self.timeToDeath = self.NUMBER_OF_FRAMES_TO_DEATH;
     };
 
-    asteroids.Projectile.prototype.VELOCITY_MAGNITUDE = 10;
-    asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 30;
+    moddef.Projectile.prototype.VELOCITY_MAGNITUDE = 10;
+    moddef.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 30;
 
-    asteroids.Projectile.prototype.MAX_DISTANCE = asteroids.Projectile.prototype.VELOCITY_MAGNITUDE *
-        asteroids.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH;
+    moddef.Projectile.prototype.MAX_DISTANCE = moddef.Projectile.prototype.VELOCITY_MAGNITUDE *
+        moddef.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH;
 
-    _.extend(asteroids.Projectile.prototype, asteroids.AsteroidsGameObject.prototype);
-    asteroids.Projectile.prototype.constructor = asteroids.Projectile;
+    _.extend(moddef.Projectile.prototype, moddef.AsteroidsGameObject.prototype);
+    moddef.Projectile.prototype.constructor = moddef.Projectile;
 
-    asteroids.Projectile.prototype.update = function () {
+    moddef.Projectile.prototype.update = function () {
         var self = this;
 
         self.timeToDeath -= 1;
@@ -324,10 +326,10 @@
             self.kill();
         }
 
-        asteroids.AsteroidsGameObject.prototype.update.call(self);
+        moddef.AsteroidsGameObject.prototype.update.call(self);
     };
 
-    asteroids.Asteroid = function (args) {
+    moddef.Asteroid = function (args) {
         var self = this;
 
         var maxAsteroidVelocityMagnitude = 4;
@@ -336,7 +338,7 @@
         var velocityRange = (maxAsteroidVelocityMagnitude - minAsteroidVelocityMagnitude);
         var asteroidVelocityMagnitude = minAsteroidVelocityMagnitude + Math.random() * velocityRange;
 
-        asteroids.AsteroidsGameObject.call(
+        moddef.AsteroidsGameObject.call(
             self,
             {
                 game: args.game,
@@ -359,7 +361,7 @@
             for (j = -1; j <= 1; j += 1) {
                 if (i !== 0 || j !== 0) {
                     self.bodies.push(
-                        new asteroids.AsteroidsGameObjectBody({
+                        new moddef.AsteroidsGameObjectBody({
                             parent: self,
                             offsetFromParent: new SAT.Vector(viewWidth * i, viewHeight * j)
                         })
@@ -369,13 +371,13 @@
         }
     };
 
-    _.extend(asteroids.Asteroid.prototype, asteroids.AsteroidsGameObject.prototype);
-    asteroids.Asteroid.prototype.constructor = asteroids.Asteroid;
+    _.extend(moddef.Asteroid.prototype, moddef.AsteroidsGameObject.prototype);
+    moddef.Asteroid.prototype.constructor = moddef.Asteroid;
 
-    asteroids.Asteroid.prototype.collidedWith = function (gameObject) {
+    moddef.Asteroid.prototype.collidedWith = function (gameObject) {
         var self = this;
 
-        if (gameObject.OBJECT_TYPE === asteroids.Projectile.prototype.OBJECT_TYPE) {
+        if (gameObject.OBJECT_TYPE === moddef.Projectile.prototype.OBJECT_TYPE) {
             self.kill();
             gameObject.kill();
 
@@ -392,14 +394,16 @@
                     scale: self.scale / 2
                 };
 
-                self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
-                self.game.gameObjects.push(new asteroids.Asteroid(asteroidArguments));
+                self.game.gameObjects.push(new moddef.Asteroid(asteroidArguments));
+                self.game.gameObjects.push(new moddef.Asteroid(asteroidArguments));
             }
         }
     };
 
-    asteroids.Ship.prototype.OBJECT_TYPE = 1;
-    asteroids.Asteroid.prototype.OBJECT_TYPE = 2;
-    asteroids.Projectile.prototype.OBJECT_TYPE = 3;
+    moddef.Ship.prototype.OBJECT_TYPE = 1;
+    moddef.Asteroid.prototype.OBJECT_TYPE = 2;
+    moddef.Projectile.prototype.OBJECT_TYPE = 3;
 
-}(window.asteroids = window.asteroids || {}));
+    return moddef;
+});
+

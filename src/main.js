@@ -27,18 +27,28 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-
-$(document).ready(function () {
-    "use strict";
-
-    var asteroidsGame = new asteroids.AsteroidsGame({
-        width: 800,
-        height: 600,
-        canvas: $("canvas#main")[0],
-        onGameOver: function (game) { game.restart(); },
-        debugMode: window.location.search.indexOf('debugMode=true') != -1,
-        humanControlled: window.location.search.indexOf('humanControlled=true') != -1
-    });
-
-    asteroidsGame.run();
+require.config({
+    paths: {
+        "jquery": "../lib/jquery",
+        "underscore": "../lib/underscore",
+        "sat": "../lib/sat"
+    }
 });
+
+require(["asteroidsGame", "jquery"], function (asteroidsGame) {
+    $(document).ready(function () {
+        "use strict";
+
+        var asteroidsGameInstance = new asteroidsGame.AsteroidsGame({
+            width: 800,
+            height: 600,
+            canvas: $("canvas#main")[0],
+            onGameOver: function (game) { game.restart(); },
+            debugMode: window.location.search.indexOf('debugMode=true') != -1,
+            humanControlled: window.location.search.indexOf('humanControlled=true') != -1
+        });
+
+        asteroidsGameInstance.run();
+    });
+});
+

@@ -27,7 +27,7 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-(function () {
+define(["mathHelperFunctions"], function (mathHelperFunctions) {
     "use strict";
 
     var PI = Math.PI;
@@ -71,4 +71,4 @@
     test("minAngularDistance returns is commutative", function () {
         equal(mathHelperFunctions.minAngularDifference(PI, HALF_PI), HALF_PI);
     });
-}());
+});
