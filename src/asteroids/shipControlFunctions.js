@@ -27,7 +27,7 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-define(["mathHelperFunctions", "asteroids/keyCodes", "asteroids/asteroidsGameObjects"], function (mathHelperFunctions, keyCodes, asteroidsGameObjects) {
+define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes", "asteroids/asteroidsGameObjects"], function (mathHelperFunctions, twoDContextHelperFunctions, keyCodes, asteroidsGameObjects) {
     "use strict";
 
     var moddef = {};
