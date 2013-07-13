@@ -216,7 +216,7 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat
     moddef.AsteroidsGame.prototype.restart = function () {
         var self = this;
 
-        var numberOfAsteroids = 5;
+        var numberOfAsteroids = 4;
         var minStartingDistanceBetweenShipAndAsteroids = 250;
         var distanceRange = _.min([self._width, self._height]) / 2 - minStartingDistanceBetweenShipAndAsteroids;
 
