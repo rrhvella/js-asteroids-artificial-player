@@ -27,7 +27,7 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-define(["asteroidsGameObjects", "shipControlFunctions", "sat", "underscore"], function (asteroidsGameObjects, shipControlFunctions) {
+define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat", "underscore"], function (asteroidsGameObjects, shipControlFunctions) {
     "use strict";
 
     var moddef = {};

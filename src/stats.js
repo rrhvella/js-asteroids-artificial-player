@@ -35,7 +35,7 @@ require.config({
     }
 });
 
-require(["asteroidsGame", "jquery"], function (asteroidsGame) {
+require(["asteroids/asteroidsGame", "jquery"], function (asteroidsGame) {
     "use strict";
 
     var match = location.search.match(/how-much=([0-9]*)/);

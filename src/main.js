@@ -35,7 +35,7 @@ require.config({
     }
 });
 
-require(["asteroidsGame", "jquery"], function (asteroidsGame) {
+require(["asteroids/asteroidsGame", "jquery"], function (asteroidsGame) {
     $(document).ready(function () {
         "use strict";
 
