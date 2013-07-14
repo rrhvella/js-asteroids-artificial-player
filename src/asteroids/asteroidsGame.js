@@ -34,7 +34,7 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControllers", "sat", "u
 
     moddef.AsteroidsGame = function (args) {
         var self = this;
-        var framesPerSecond = 30;
+        var framesPerSecond = 60;
         var updatesPerSecond = 60;
 
         self.debugMode = (args.debugMode) ? true : false;
