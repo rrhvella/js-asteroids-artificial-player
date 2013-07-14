@@ -3,7 +3,7 @@ Asteroids Artificial Player in JavaScript
 
 To run this sketch, just clone the repository and run index.html.
 
-If you don't want to clone the repository, index.html is also the [project page]().
+If you don't want to clone the repository, index.html is also the [project page](http://rrhvella.github.io/js-asteroids-artificial-player/).
 
 Please use a modern browser.
 
