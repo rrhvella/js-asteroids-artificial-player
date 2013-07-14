@@ -37,7 +37,7 @@ define(["sat", "satExtensions"], function () {
 
     var polygonContainsPoints = function (polygon, points) {
         var maximumError = 0.0001;
-        var i = 0;
+        var i;
 
         for (i = 0; i < polygon.points.length; i += 1) {
             ok(polygon.points[i].x - points[i].x <= maximumError);

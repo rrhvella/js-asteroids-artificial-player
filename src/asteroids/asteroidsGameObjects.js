@@ -39,15 +39,13 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
         self.game = args.game;
 
         self.position = args.position ? args.position.clone() : new SAT.Vector(0, 0);
-
         self.rotation = args.rotation || 0;
-
         self.scale = args.scale;
+
+        self.velocity = args.velocity ? args.velocity.clone() : new SAT.Vector(0, 0);
 
         self.image = new Image();
         self.image.src = args.imageSrc;
-
-        self.velocity = args.velocity ? args.velocity.clone() : new SAT.Vector(0, 0);
 
         self.bodies = [ new moddef.AsteroidsGameObjectBody({ parent: self }) ];
     };
@@ -198,15 +196,14 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
         );
     };
 
+    var brakingForceMagnitude = 0.2;
+    var accelerationMagnitude = 0.6;
+
     moddef.Ship.prototype.ANGULAR_VELOCITY = Math.PI * 0.025;
     moddef.Ship.prototype.MAXIMUM_VELOCITY_MAGNITUDE = 8;
 
-    var brakingForceMagnitude = 0.2;
     moddef.Ship.prototype.BRAKING_FORCE_MAGNITUDE = brakingForceMagnitude;
-
-    var accelerationMagnitude = 0.6;
     moddef.Ship.prototype.ACCELERATION_MAGNITUDE = accelerationMagnitude;
-
     moddef.Ship.prototype.ACTUAL_ACCELERATION_MAGNITUDE = accelerationMagnitude - brakingForceMagnitude;
 
     _.extend(moddef.Ship.prototype, moddef.AsteroidsGameObject.prototype);
@@ -216,11 +213,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
         var self = this;
 
         self.rotation = mathHelperFunctions.normalizeAngle(self.rotation);
-
-        var result = SAT.angleToNormal(self.rotation);
-        result.normalize();
-
-        return result;
+        return SAT.angleToNormal(self.rotation);
     };
 
     moddef.Ship.prototype.collidedWith = function (gameObject) {
@@ -331,9 +324,8 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
 
     moddef.Asteroid = function (args) {
         var self = this;
-
-        var maxAsteroidVelocityMagnitude = 4;
         var minAsteroidVelocityMagnitude = 1;
+        var maxAsteroidVelocityMagnitude = 4;
 
         var velocityRange = (maxAsteroidVelocityMagnitude - minAsteroidVelocityMagnitude);
         var asteroidVelocityMagnitude = minAsteroidVelocityMagnitude + Math.random() * velocityRange;
@@ -351,6 +343,15 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
 
             }
         );
+
+        self._addAsteroidBodies();
+    };
+
+    _.extend(moddef.Asteroid.prototype, moddef.AsteroidsGameObject.prototype);
+    moddef.Asteroid.prototype.constructor = moddef.Asteroid;
+
+    moddef.Asteroid.prototype._addAsteroidBodies = function () {
+        var self = this;
 
         var viewWidth = self.game.getWidth();
         var viewHeight = self.game.getHeight();
@@ -371,17 +372,13 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
         }
     };
 
-    _.extend(moddef.Asteroid.prototype, moddef.AsteroidsGameObject.prototype);
-    moddef.Asteroid.prototype.constructor = moddef.Asteroid;
-
     moddef.Asteroid.prototype.collidedWith = function (gameObject) {
         var self = this;
+        var minimumScale = 32;
 
         if (gameObject.OBJECT_TYPE === moddef.Projectile.prototype.OBJECT_TYPE) {
             self.kill();
             gameObject.kill();
-
-            var minimumScale = 32;
 
             if (self.scale <= minimumScale) {
                 if (self.game.getAsteroids().length === 0) {

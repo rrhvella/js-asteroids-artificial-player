@@ -38,9 +38,14 @@ require.config({
 require(["asteroids/asteroidsGame", "jquery"], function (asteroidsGame) {
     "use strict";
 
+    var defaultNumberOfGames = 10;
+    var confidenceLevel = 0.95;
+    var criticalValue = 1.96;
+    var decimalPlaces = 2;
+
     var match = location.search.match(/how-much=([0-9]*)/);
 
-    var numberOfGames = match ? match[1] : 10;
+    var numberOfGames = match ? match[1] : defaultNumberOfGames;
     var asteroidsGameInstance = new asteroidsGame.AsteroidsGame({ width: 800, height: 600 });
 
     var gamesWon = 0;
@@ -54,12 +59,10 @@ require(["asteroids/asteroidsGame", "jquery"], function (asteroidsGame) {
     }
 
     var ratioOfGamesWon = gamesWon / numberOfGames;
-    var confidenceLevel = 0.95;
-
-    var marginOfError = 1.96 / (2 * Math.sqrt(numberOfGames));
+    var marginOfError = criticalValue / (2 * Math.sqrt(numberOfGames));
 
     var formatAsPercentage = function (ratio) {
-        return ratio.toFixed(2) * 100 + "%";
+        return ratio.toFixed(decimalPlaces) * 100 + "%";
     };
 
     $("div#numberOfGames").text(numberOfGames);

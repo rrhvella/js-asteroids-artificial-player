@@ -34,9 +34,7 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat
 
     moddef.AsteroidsGame = function (args) {
         var self = this;
-
         var framesPerSecond = 30;
-
         var updatesPerSecond = 60;
 
         self.debugMode = (args.debugMode) ? true : false;
@@ -50,15 +48,15 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat
             updatesPerSecond = 15;
         }
 
+        self.drawingFrameSize = 1000.0 / framesPerSecond;
+        self.updateFrameSize = 1000.0 / updatesPerSecond;
+
         self.setCanvas(args.canvas);
 
         self.setWidth(args.width);
         self.setHeight(args.height);
 
         self._keysDownDict = {};
-
-        self.drawingFrameSize = 1000.0 / framesPerSecond;
-        self.updateFrameSize = 1000.0 / updatesPerSecond;
 
         $(window).keydown(function (event) {
             self._recordKeyDown(event.which);
@@ -159,7 +157,7 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat
     moddef.AsteroidsGame.prototype.addIgnoredCollisionBetweenTypes = function (objectType1, objectType2) {
         var self = this;
 
-        if (!(objectType1 in self._ignoredCollisions)) {
+        if (!_.has(self._ignoredCollisions, objectType1)) {
             self._ignoredCollisions[objectType1] = {};
         }
 
@@ -172,11 +170,11 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat
         var objectType1 = object1.OBJECT_TYPE;
         var objectType2 = object2.OBJECT_TYPE;
 
-        if (!(objectType1 in self._ignoredCollisions)) {
+        if (!_.has(self._ignoredCollisions, objectType1)) {
             return false;
         }
 
-        return objectType2 in self._ignoredCollisions[objectType1];
+        return _.indexOf(objectType2, self._ignoredCollisions[objectType1]) !== -1;
     };
 
     moddef.AsteroidsGame.prototype.isKeyDown = function (code) {
@@ -215,9 +213,9 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat
 
     moddef.AsteroidsGame.prototype.restart = function () {
         var self = this;
-
         var numberOfAsteroids = 4;
         var minStartingDistanceBetweenShipAndAsteroids = 250;
+
         var distanceRange = _.min([self._width, self._height]) / 2 - minStartingDistanceBetweenShipAndAsteroids;
 
         var ship = new asteroidsGameObjects.Ship({
@@ -244,9 +242,8 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat
         var i;
 
         for (i = 0; i < numberOfAsteroids; i += 1) {
-            var randomAsteroidPosition = SAT.randomNormal().scale(
-                Math.random() * distanceRange + minStartingDistanceBetweenShipAndAsteroids
-            ).add(ship.position);
+            var asteroidDistanceFromShip = Math.random() * distanceRange + minStartingDistanceBetweenShipAndAsteroids;
+            var randomAsteroidPosition = SAT.randomNormal().scale(asteroidDistanceFromShip).add(ship.position);
 
             self.gameObjects.push(
                 new asteroidsGameObjects.Asteroid({ game: self, position: randomAsteroidPosition })

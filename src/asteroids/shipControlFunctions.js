@@ -62,18 +62,15 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
 
     moddef.AIControlFunction = function (args) {
         var self = this;
+        self._debugPursuidAsteroidCircleImage = new Image();
+        self._debugPursuidAsteroidCircleImage.src = "media/redCircle.png";
+        self._debugProjectionBoxImage = new Image();
+        self._debugProjectionBoxImage.src = "media/blueBox.png";
+        self._debugArrowImage = new Image();
+        self._debugArrowImage.src = "media/redArrow.png";
 
         self.ship = args.ship;
         self.game = args.game;
-
-        self._debugPursuidAsteroidCircleImage = new Image();
-        self._debugPursuidAsteroidCircleImage.src = "media/redCircle.png";
-
-        self._debugProjectionBoxImage = new Image();
-        self._debugProjectionBoxImage.src = "media/blueBox.png";
-
-        self._debugArrowImage = new Image();
-        self._debugArrowImage.src = "media/redArrow.png";
 
         self._debugProjectionBoxes = null;
         self._debugAsteroidsAndFuturePositions = null;
@@ -92,16 +89,18 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
 
     moddef.AIControlFunction.prototype._drawAsteroidCurrentAndFuturePositionsDebugCircles = function () {
         var self = this;
+        var targetCircleMargin = 4;
 
         var drawingContext = self.game.getDrawingContext();
-        var targetCircleMargin = 4;
 
         _.each(self._debugAsteroidsAndFuturePositions, function (asteroidAndFuturePosition) {
             var asteroid = asteroidAndFuturePosition.asteroid;
             var futureBodyPosition = asteroidAndFuturePosition.futureBodyPosition;
+
             var image = asteroidAndFuturePosition.image;
 
             var radius = asteroid.getEnclosingCircleRadius() + targetCircleMargin;
+
             var diameter = radius * 2;
 
             drawingContext.drawImage(
@@ -232,11 +231,12 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
 
             _.every(asteroid.bodies, function (asteroidBody) {
                 var bodyPosition = asteroidBody.getOffsetPosition();
-                var asteroidVelocity = asteroidBody.parent.velocity;
 
                 var timeToTurnAround = Math.PI / self.ship.ANGULAR_VELOCITY;
-
                 var lookAheadTime = timeToTurnAround + 1;
+
+                var asteroidVelocity = asteroidBody.parent.velocity;
+
                 var asteroidBodyFuturePosition = asteroidVelocity.clone().scale(lookAheadTime).add(bodyPosition);
 
                 var asteroidMovementProjectionBox = self._getMovementProjectionBox(
@@ -285,6 +285,8 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
 
     moddef.AIControlFunction.prototype._getPursuitForce = function () {
         var self = this;
+        var shipProximityFactor = 0.75;
+        var replacementMagnitudeToMaintainDirection = 0.00000001;
 
         var closestAsteroidBody = self._getClosestAsteroidBody();
 
@@ -292,19 +294,15 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
             return new SAT.Vector(0, 0);
         }
 
-        var shipVelocityMagnitude = self.ship.velocity.len();
-
         var closestBodyFuturePosition = self._getFutureAsteroidPositionForPursuit(closestAsteroidBody);
-
         var futureBodyOffset = closestBodyFuturePosition.clone().sub(self.ship.position);
-        var shipProximityFactor = 0.75;
 
         var asteroidRadius = closestAsteroidBody.parent.getEnclosingCircleRadius();
         var shipRadius = self.ship.getEnclosingCircleRadius();
         var alteredProjectileDistance = asteroidsGameObjects.Projectile.prototype.MAX_DISTANCE * shipProximityFactor;
+        var forceMagnitude = futureBodyOffset.len() - asteroidRadius - shipRadius - alteredProjectileDistance;
 
-        var forceMagnitude = futureBodyOffset.len() -
-            asteroidRadius - shipRadius - alteredProjectileDistance;
+        var shipVelocityMagnitude = self.ship.velocity.len();
 
         if (shipVelocityMagnitude > forceMagnitude) {
             forceMagnitude = shipVelocityMagnitude;
@@ -317,7 +315,6 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         });
 
         if (forceMagnitude === 0) {
-            var replacementMagnitudeToMaintainDirection = 0.00000001;
             forceMagnitude = replacementMagnitudeToMaintainDirection;
         }
 
@@ -330,9 +327,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         var asteroidGameObjects = self.ship.game.getAsteroids();
 
         var asteroidBodies = _.flatten(
-            _.map(asteroidGameObjects, function (asteroid) {
-                return asteroid.bodies;
-            })
+            _.map(asteroidGameObjects, function (asteroid) { return asteroid.bodies; })
         );
 
         var closestAsteroid = _.min(asteroidBodies, function (asteroidBody) {
@@ -362,8 +357,8 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         var self = this;
 
         var bodyPosition = asteroidBody.getOffsetPosition();
-
         var bodyOffset = bodyPosition.clone().sub(self.ship.position);
+
         var euclideanDistance = bodyOffset.len() - asteroidBody.parent.getEnclosingCircleRadius() -
             self.ship.getEnclosingCircleRadius();
 
@@ -384,6 +379,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         }
 
         self._debugDesiredVelocity = desiredVelocity;
+
         self._turnShipTowardsAngle(desiredVelocity.angle());
 
         var howMuchShipNeedsToTurn = mathHelperFunctions.minAngularDifference(
@@ -391,9 +387,10 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
             self.ship.rotation
         );
 
-        if (howMuchShipNeedsToTurn < Math.PI / 2 &&
-            desiredVelocity.len() >= self.ship.velocity.len() + self.ship.ACTUAL_ACCELERATION_MAGNITUDE) {
+        var acceleratingWillNotGoAboveDesiredVelocity =
+            desiredVelocity.len() >= self.ship.velocity.len() + self.ship.ACTUAL_ACCELERATION_MAGNITUDE;
 
+        if (howMuchShipNeedsToTurn < Math.PI / 2 && acceleratingWillNotGoAboveDesiredVelocity) {
             self.ship.accelerate();
         }
     };
