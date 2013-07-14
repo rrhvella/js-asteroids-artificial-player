@@ -44,8 +44,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
 
         self.velocity = args.velocity ? args.velocity.clone() : new SAT.Vector(0, 0);
 
-        self.image = new Image();
-        self.image.src = args.imageSrc;
+        self.image = args.image;
 
         self.bodies = [ new moddef.AsteroidsGameObjectBody({ parent: self }) ];
     };
@@ -190,8 +189,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
                 position: args.position,
                 scale: 32,
 
-                imageSrc: "media/ship.png"
-
+                image: self.IMAGE
             }
         );
     };
@@ -205,6 +203,9 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
     moddef.Ship.prototype.BRAKING_FORCE_MAGNITUDE = brakingForceMagnitude;
     moddef.Ship.prototype.ACCELERATION_MAGNITUDE = accelerationMagnitude;
     moddef.Ship.prototype.ACTUAL_ACCELERATION_MAGNITUDE = accelerationMagnitude - brakingForceMagnitude;
+
+    moddef.Ship.prototype.IMAGE = new Image();
+    moddef.Ship.prototype.IMAGE.src = "media/ship.png";
 
     _.extend(moddef.Ship.prototype, moddef.AsteroidsGameObject.prototype);
     moddef.Ship.prototype.constructor = moddef.Ship;
@@ -295,7 +296,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
             scale: 5,
             velocity: velocity,
             position: args.position.add(velocity),
-            imageSrc: "media/asteroid.png"
+            image: self.IMAGE
         });
 
         self.timeToDeath = self.NUMBER_OF_FRAMES_TO_DEATH;
@@ -303,6 +304,9 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
 
     moddef.Projectile.prototype.VELOCITY_MAGNITUDE = 10;
     moddef.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH = 30;
+
+    moddef.Projectile.prototype.IMAGE = new Image();
+    moddef.Projectile.prototype.IMAGE.src = "media/asteroid.png";
 
     moddef.Projectile.prototype.MAX_DISTANCE = moddef.Projectile.prototype.VELOCITY_MAGNITUDE *
         moddef.Projectile.prototype.NUMBER_OF_FRAMES_TO_DEATH;
@@ -339,8 +343,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
                 velocity: SAT.randomNormal().scale(asteroidVelocityMagnitude),
                 scale: args.scale || 128,
 
-                imageSrc: "media/asteroid.png"
-
+                image: self.IMAGE
             }
         );
 
@@ -349,6 +352,9 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "underscore", "satE
 
     _.extend(moddef.Asteroid.prototype, moddef.AsteroidsGameObject.prototype);
     moddef.Asteroid.prototype.constructor = moddef.Asteroid;
+
+    moddef.Asteroid.prototype.IMAGE = new Image();
+    moddef.Asteroid.prototype.IMAGE.src = "media/asteroid.png";
 
     moddef.Asteroid.prototype._addAsteroidBodies = function () {
         var self = this;
