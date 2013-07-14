@@ -39,10 +39,15 @@ require(["asteroids/asteroidsGame", "jquery"], function (asteroidsGame) {
     $(document).ready(function () {
         "use strict";
 
+        var canvas = $("<canvas id='main'/>");
+
+        $("div#loadingMessage").remove();
+        $("div#content").prepend(canvas);
+
         var asteroidsGameInstance = new asteroidsGame.AsteroidsGame({
             width: 800,
             height: 600,
-            canvas: $("canvas#main")[0],
+            canvas: canvas[0],
             onGameOver: function (game) { game.restart(); },
             debugMode: window.location.search.indexOf("debugMode=true") !== -1,
             humanControlled: window.location.search.indexOf("humanControlled=true") !== -1

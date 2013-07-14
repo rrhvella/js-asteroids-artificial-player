@@ -1,9 +1,12 @@
 div, canvas {
-    border: solid black 1px;
     display: block;
     margin-right: auto;
     margin-left: auto;
     width: 800px;
+}
+
+canvas {
+    border: solid black 1px;
     box-shadow: 3px 3px 5px #888888;
 }
 
