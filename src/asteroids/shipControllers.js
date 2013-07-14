@@ -32,17 +32,17 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
 
     var moddef = {};
 
-    moddef.HumanInputControlFunction = function (args) {
+    moddef.HumanInputController = function (args) {
         var self = this;
 
         self.game = args.game;
         self.ship = args.ship;
     };
 
-    moddef.HumanInputControlFunction.prototype.draw = function () {
+    moddef.HumanInputController.prototype.draw = function () {
     };
 
-    moddef.HumanInputControlFunction.prototype.update = function () {
+    moddef.HumanInputController.prototype.update = function () {
         var self = this;
 
         if (self.game.isKeyDown(keyCodes.UP)) {
@@ -60,7 +60,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         }
     };
 
-    moddef.AIControlFunction = function (args) {
+    moddef.AIController = function (args) {
         var self = this;
         self._debugPursuidAsteroidCircleImage = new Image();
         self._debugPursuidAsteroidCircleImage.src = "media/redCircle.png";
@@ -77,7 +77,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         self._debugDesiredVelocity = null;
     };
 
-    moddef.AIControlFunction.prototype.draw = function () {
+    moddef.AIController.prototype.draw = function () {
         var self = this;
 
         if (self.game.debugMode) {
@@ -87,7 +87,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         }
     };
 
-    moddef.AIControlFunction.prototype._drawAsteroidCurrentAndFuturePositionsDebugCircles = function () {
+    moddef.AIController.prototype._drawAsteroidCurrentAndFuturePositionsDebugCircles = function () {
         var self = this;
         var targetCircleMargin = 4;
 
@@ -125,7 +125,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         });
     };
 
-    moddef.AIControlFunction.prototype._drawAsteroidProjectionBoxes = function () {
+    moddef.AIController.prototype._drawAsteroidProjectionBoxes = function () {
         var self = this;
 
         var drawingContext = self.game.getDrawingContext();
@@ -154,7 +154,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         );
     };
 
-    moddef.AIControlFunction.prototype._drawDesiredVelocityDebugArrow = function () {
+    moddef.AIController.prototype._drawDesiredVelocityDebugArrow = function () {
         var self = this;
 
         if (!self._debugDesiredVelocity) {
@@ -185,7 +185,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         twoDContextHelperFunctions.resetTransform(drawingContext);
     };
 
-    moddef.AIControlFunction.prototype.update = function () {
+    moddef.AIController.prototype.update = function () {
         var self = this;
 
         self._debugAsteroidsAndFuturePositions = [];
@@ -203,7 +203,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         self._applyFireBehaviour();
     };
 
-    moddef.AIControlFunction.prototype._getTotalAvoidanceForce = function () {
+    moddef.AIController.prototype._getTotalAvoidanceForce = function () {
         var self = this;
 
         var totalAvoidanceForce = new SAT.Vector(0, 0);
@@ -272,7 +272,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         return totalAvoidanceForce;
     };
 
-    moddef.AIControlFunction.prototype._getMovementProjectionBox = function (currentPosition, futurePosition, scale) {
+    moddef.AIController.prototype._getMovementProjectionBox = function (currentPosition, futurePosition, scale) {
         var projectionBox = new SAT.RotatableBox(
             futurePosition.clone().sub(currentPosition).scale(0.5).add(currentPosition),
             futurePosition.angleInRelationTo(currentPosition),
@@ -283,7 +283,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         return projectionBox;
     };
 
-    moddef.AIControlFunction.prototype._getPursuitForce = function () {
+    moddef.AIController.prototype._getPursuitForce = function () {
         var self = this;
         var shipProximityFactor = 0.75;
         var replacementMagnitudeToMaintainDirection = 0.00000001;
@@ -321,7 +321,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         return futureBodyOffset.normalize().scale(forceMagnitude);
     };
 
-    moddef.AIControlFunction.prototype._getClosestAsteroidBody = function () {
+    moddef.AIController.prototype._getClosestAsteroidBody = function () {
         var self = this;
 
         var asteroidGameObjects = self.ship.game.getAsteroids();
@@ -341,7 +341,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         return closestAsteroid;
     };
 
-    moddef.AIControlFunction.prototype._getFutureAsteroidPositionForPursuit = function (asteroidBody) {
+    moddef.AIController.prototype._getFutureAsteroidPositionForPursuit = function (asteroidBody) {
         var self = this;
 
         var bodyPosition = asteroidBody.getOffsetPosition();
@@ -353,7 +353,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
     };
 
 
-    moddef.AIControlFunction.prototype._combinedAsteroidBodyDistance = function (asteroidBody) {
+    moddef.AIController.prototype._combinedAsteroidBodyDistance = function (asteroidBody) {
         var self = this;
 
         var bodyPosition = asteroidBody.getOffsetPosition();
@@ -371,7 +371,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
             angularDistance / self.ship.ANGULAR_VELOCITY;
     };
 
-    moddef.AIControlFunction.prototype._controlShipBasedOnDesiredVelocity = function (desiredVelocity) {
+    moddef.AIController.prototype._controlShipBasedOnDesiredVelocity = function (desiredVelocity) {
         var self = this;
 
         if (desiredVelocity.x === 0 && desiredVelocity.y === 0) {
@@ -395,7 +395,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         }
     };
 
-    moddef.AIControlFunction.prototype._turnShipTowardsAngle = function (angle) {
+    moddef.AIController.prototype._turnShipTowardsAngle = function (angle) {
         var self = this;
 
         var normalizedShipRotation = mathHelperFunctions.normalizeAngle(self.ship.rotation);
@@ -424,7 +424,7 @@ define(["mathHelperFunctions", "twoDContextHelperFunctions", "asteroids/keyCodes
         }
     };
 
-    moddef.AIControlFunction.prototype._applyFireBehaviour = function () {
+    moddef.AIController.prototype._applyFireBehaviour = function () {
         var self = this;
 
         var thereIsAnAsteroidWithinTheLineOfSight = _.any(

@@ -27,7 +27,7 @@
  either expressed or implied, of the FreeBSD Project.
  */
 
-define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat", "underscore"], function (asteroidsGameObjects, shipControlFunctions) {
+define(["asteroids/asteroidsGameObjects", "asteroids/shipControllers", "sat", "underscore"], function (asteroidsGameObjects, shipControllers) {
     "use strict";
 
     var moddef = {};
@@ -226,10 +226,10 @@ define(["asteroids/asteroidsGameObjects", "asteroids/shipControlFunctions", "sat
             )
         });
 
-        var controllerClass = shipControlFunctions.AIControlFunction;
+        var controllerClass = shipControllers.AIController;
 
         if (self.humanControlled) {
-            controllerClass = shipControlFunctions.HumanInputControlFunction;
+            controllerClass = shipControllers.HumanInputController;
         }
 
         var controller = new controllerClass({ game: self, ship: ship });
